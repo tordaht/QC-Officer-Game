@@ -37,6 +37,8 @@ class UIManager {
             slowmoBtn: document.getElementById('slowmo-btn'),
             // controlLightBtn artık yok - sürekli aktif
             soundToggle: document.getElementById('sound-toggle'),
+            pauseBtn: document.getElementById('pause-btn'),
+            settingsBtn: document.getElementById('settings-toggle'),
             mobileLeftBtn: document.getElementById('mobile-left'),
             mobileRightBtn: document.getElementById('mobile-right'),
             langTrBtn: document.getElementById('lang-tr'),
@@ -59,7 +61,7 @@ class UIManager {
         }
 
         // Dil değişikliği olayını dinle
-        document.addEventListener('languageChanged', () => {
+        EventBus.subscribe('languageChanged', () => {
             this.updateAllLanguageTexts();
         });
 
@@ -69,7 +71,7 @@ class UIManager {
     }
 
     setupSettingsPanel() {
-        const pauseBtn = document.getElementById('pause-toggle');
+        const settingsBtn = this.elements.settingsBtn;
         const panel = document.getElementById('settings-panel');
         const closeBtn = document.getElementById('settings-close');
         const volM = document.getElementById('volume-master');
@@ -78,7 +80,7 @@ class UIManager {
         const qual = document.getElementById('graphics-quality');
         const filt = document.getElementById('color-filter');
 
-        if (!pauseBtn || !panel) return;
+        if (!settingsBtn || !panel) return;
 
         // init values
         volM && (volM.value = window.SettingsManager.get('sound.master'));
@@ -87,7 +89,7 @@ class UIManager {
         qual && (qual.value = window.SettingsManager.get('graphics.quality'));
         filt && (filt.value = window.SettingsManager.get('accessibility.colorFilter'));
 
-        pauseBtn.addEventListener('click', () => {
+        settingsBtn.addEventListener('click', () => {
             panel.classList.toggle('show');
         });
         closeBtn && closeBtn.addEventListener('click', () => panel.classList.remove('show'));
@@ -427,6 +429,20 @@ class SoundManager {
     
     toggle() {
         this.enabled = !this.enabled;
+        const icon = document.querySelector('#sound-toggle i');
+        if (icon) {
+            icon.className = this.enabled ? 'fas fa-volume-up' : 'fas fa-volume-mute';
+        }
+    }
+
+    // temporarily mute while preserving previous state
+    mute(state) {
+        if (state) {
+            this.prevEnabled = this.enabled;
+            this.enabled = false;
+        } else {
+            this.enabled = this.prevEnabled !== undefined ? this.prevEnabled : true;
+        }
         const icon = document.querySelector('#sound-toggle i');
         if (icon) {
             icon.className = this.enabled ? 'fas fa-volume-up' : 'fas fa-volume-mute';

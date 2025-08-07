@@ -3,7 +3,9 @@
 
 const GameConfig = {
     version: "2.0.0",
-    
+    // active language shared across modules
+    currentLang: localStorage.getItem('qc_currentLang') || 'en',
+
     // Oyun ayarları
     maxWidth: 1000,
     maxHeight: 600,

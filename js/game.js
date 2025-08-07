@@ -1,6 +1,56 @@
 // KALITE KONTROL SIMÜLATÖRÜ PRO - OYUN MOTORU
 // Sürüm: v2.0.0
 
+// basit oyun döngüsü yöneticisi
+class GameEngine {
+    constructor(game) {
+        this.game = game;
+        this.raf = null;
+        this.paused = false;
+        this.lastTime = 0;
+    }
+
+    loop = (timestamp) => {
+        if (!this.raf) return; // stopped
+        const delta = (timestamp - this.lastTime) / 1000;
+        this.lastTime = timestamp;
+        if (!this.paused) {
+            this.game.update(delta);
+            this.game.draw();
+            this.game.updateUI();
+            if (this.game.timeLeft <= 0) {
+                this.game.endLevel();
+                return;
+            }
+        }
+        this.raf = requestAnimationFrame(this.loop);
+    };
+
+    start() {
+        this.paused = false;
+        this.lastTime = performance.now();
+        this.raf = requestAnimationFrame(this.loop);
+    }
+
+    stop() {
+        if (this.raf) cancelAnimationFrame(this.raf);
+        this.raf = null;
+    }
+
+    pause() {
+        if (this.paused) return;
+        this.paused = true;
+        this.game.uiManager.soundManager.mute(true);
+    }
+
+    resume() {
+        if (!this.paused) return;
+        this.paused = false;
+        this.game.uiManager.soundManager.mute(false);
+        this.lastTime = performance.now();
+    }
+}
+
 class Game {
     constructor() {
         this.canvas = document.getElementById('game-canvas');
@@ -13,7 +63,6 @@ class Game {
         this.score = 0;
         this.timeLeft = 0;
         this.combo = 0;
-        this.lastTime = 0;
         this.spawnTimer = 0;
         
         // Objeler
@@ -21,6 +70,7 @@ class Game {
         this.conveyorBelt = new ConveyorBelt(this.canvas);
         this.controlLight = new ControlLight(this.canvas);
         this.backgroundManager = new BackgroundManager(this.canvas);
+        this.engine = new GameEngine(this);
         
         // Şişe görselleri yükleme
         this.bottleImages = {};
@@ -75,6 +125,7 @@ class Game {
         this.uiManager.elements.startButton.addEventListener('click', () => {
             this.uiManager.soundManager.play('click');
             this.uiManager.hideStartScreen();
+            window.GameSaveManager?.clear();
             this.startGame();
         });
         
@@ -82,6 +133,7 @@ class Game {
             this.uiManager.soundManager.play('click');
             this.uiManager.hideGameOverScreen();
             this.resetGame();
+            window.GameSaveManager?.clear();
             this.startGame();
         });
         
@@ -91,6 +143,11 @@ class Game {
         this.uiManager.elements.soundToggle.addEventListener('click', () => {
             this.uiManager.soundManager.toggle();
             this.uiManager.soundManager.play('click');
+        });
+
+        // Pause button
+        this.uiManager.elements.pauseBtn?.addEventListener('click', () => {
+            this.togglePause();
         });
         
         // Mobil kontroller
@@ -109,6 +166,23 @@ class Game {
             e.preventDefault();
             // Mobil kontrol mantığı gerekirse buraya eklenebilir
         });
+    }
+
+    togglePause() {
+        if (this.gameState !== 'playing' && this.gameState !== 'paused') return;
+
+        if (this.engine.paused) {
+            this.engine.resume();
+            this.gameState = 'playing';
+        } else {
+            this.engine.pause();
+            this.gameState = 'paused';
+        }
+
+        const icon = this.uiManager.elements.pauseBtn?.querySelector('i');
+        if (icon) {
+            icon.className = this.engine.paused ? 'fas fa-play' : 'fas fa-pause';
+        }
     }
     
     resizeCanvas() {
@@ -140,6 +214,7 @@ class Game {
     }
     
     startGame() {
+        this.engine.stop();
         this.bottles = [];
         this.combo = 0;
         this.clearAllEffects();
@@ -163,14 +238,19 @@ class Game {
             microCracksFound: 0
         };
     }
+
+    loadState(data) {
+        this.currentLevel = data.level || 0;
+        this.score = data.score || 0;
+        this.combo = data.combo || 0;
+    }
     
     startLevel() {
         const config = ConfigUtils.getLevelConfig(this.currentLevel);
         this.timeLeft = config.duration;
         this.spawnTimer = 0;
         this.gameState = 'playing';
-        this.lastTime = performance.now();
-        
+
         // Seviye istatistiklerini sıfırla
         this.stats.levelStart = performance.now();
         this.stats.levelMistakes = 0;
@@ -180,8 +260,8 @@ class Game {
         
         // Kontrol ışığını güncelle
         this.controlLight.updateConfig(config);
-        
-        requestAnimationFrame((timestamp) => this.gameLoop(timestamp));
+
+        this.engine.start();
     }
     
     setupDistractions(config) {
@@ -209,22 +289,7 @@ class Game {
         }, 4000);
     }
     
-    gameLoop(timestamp) {
-        if (this.gameState !== 'playing') return;
-        
-        const deltaTime = (timestamp - this.lastTime) / 1000;
-        this.lastTime = timestamp;
-        
-        this.update(deltaTime);
-        this.draw();
-        this.updateUI();
-        
-        if (this.timeLeft <= 0) {
-            this.endLevel();
-        } else {
-            requestAnimationFrame((timestamp) => this.gameLoop(timestamp));
-        }
-    }
+    // game loop handled by GameEngine
     
     update(deltaTime) {
         // Zamanlayıcı
@@ -266,10 +331,10 @@ class Game {
         
         // Arka planı güncelle
         this.backgroundManager.update(effectiveSpeed, deltaTime);
-        
+
         // Ekran dışına çıkan şişeleri kontrol et
         this.checkMissedBottles();
-        
+
         // Başarımları kontrol et
         this.uiManager.achievementSystem.check({
             stats: this.stats,
@@ -277,6 +342,13 @@ class Game {
             currentLevel: this.currentLevel,
             score: this.score,
             gameState: this.gameState
+        });
+
+        // Kaydı periyodik olarak güncelle
+        window.GameSaveManager?.save({
+            level: this.currentLevel,
+            score: this.score,
+            combo: this.combo
         });
     }
     
@@ -290,6 +362,7 @@ class Game {
         this.conveyorBelt.draw(this.ctx);
         
         // Kontrol ışığını çiz
+        this.controlLight.setCombo(this.combo);
         this.controlLight.draw(this.ctx);
         
         // Şişeleri çiz
@@ -486,6 +559,7 @@ class Game {
     }
     
     endLevel() {
+        this.engine.stop();
         this.currentLevel++;
         
         // Hızlı bitirme başarımı kontrolü
@@ -508,6 +582,8 @@ class Game {
     }
     
     endGame(isWin = false) {
+        this.engine.stop();
+        window.GameSaveManager?.clear();
         this.gameState = 'gameover';
         this.clearAllEffects();
         
@@ -887,6 +963,7 @@ class ControlLight {
         this.width = GameConfig.controlLight.width;
         this.intensity = GameConfig.controlLight.intensity;
         this.animationPhase = 0;
+        this.combo = 0; // current combo multiplier for glow strength
         this.updateDimensions(canvas.width, canvas.height);
     }
     
@@ -920,32 +997,49 @@ class ControlLight {
     
     draw(ctx) {
         if (!this.isAlwaysActive) return;
-        
-        // Dikdörtgen kontrol ışığı alanı - sürekli aktif
-        const pulseFactor = 0.9 + Math.sin(this.animationPhase) * 0.1;
-        
+
+        // pulse grows slightly with combo multiplier
+        const comboFactor = 1 + Math.min(this.combo, 10) * 0.05;
+        const pulseFactor = 0.9 + Math.sin(this.animationPhase) * 0.1 * comboFactor;
+
+        // glow backdrop
+        ctx.save();
+        ctx.globalCompositeOperation = 'lighter';
+        const radius = this.lightWidth * 0.8;
+        const radial = ctx.createRadialGradient(
+            this.centerX, this.beltY + this.lightHeight / 2, 0,
+            this.centerX, this.beltY + this.lightHeight / 2, radius
+        );
+        radial.addColorStop(0, `rgba(0,255,255,${0.15 * comboFactor * pulseFactor})`);
+        radial.addColorStop(1, 'rgba(0,255,255,0)');
+        ctx.fillStyle = radial;
+        ctx.beginPath();
+        ctx.arc(this.centerX, this.beltY + this.lightHeight / 2, radius, 0, Math.PI * 2);
+        ctx.fill();
+        ctx.restore();
+
         // Ana ışık dikdörtgeni
         const gradient = ctx.createLinearGradient(
             this.lightLeft, this.beltY,
             this.lightRight, this.beltY
         );
-        
+
         gradient.addColorStop(0, 'rgba(255, 255, 255, 0)');
         gradient.addColorStop(0.2, `rgba(255, 255, 255, ${this.intensity * 0.4 * pulseFactor})`);
         gradient.addColorStop(0.5, `rgba(255, 255, 255, ${this.intensity * 0.7 * pulseFactor})`);
         gradient.addColorStop(0.8, `rgba(255, 255, 255, ${this.intensity * 0.4 * pulseFactor})`);
         gradient.addColorStop(1, 'rgba(255, 255, 255, 0)');
-        
+
         ctx.fillStyle = gradient;
         ctx.fillRect(this.lightLeft, this.beltY, this.lightWidth, this.lightHeight);
-        
+
         // Işık kenarları (daha belirgin alan)
         ctx.strokeStyle = `rgba(200, 200, 255, ${0.6 * pulseFactor})`;
         ctx.lineWidth = 3;
         ctx.setLineDash([8, 4]);
         ctx.strokeRect(this.lightLeft, this.beltY, this.lightWidth, this.lightHeight);
         ctx.setLineDash([]);
-        
+
         // "KONTROL ALANI" yazısı
         ctx.fillStyle = `rgba(255, 255, 255, ${0.8 * pulseFactor})`;
         ctx.font = 'bold 14px Orbitron';
@@ -954,6 +1048,10 @@ class ControlLight {
         ctx.shadowBlur = 5;
         ctx.fillText('KONTROL ALANI', this.centerX, this.beltY - 15);
         ctx.shadowBlur = 0;
+    }
+
+    setCombo(combo) {
+        this.combo = combo;
     }
     
     isInLightZone(bottleX) {

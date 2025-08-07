@@ -1,6 +1,41 @@
 // KALITE KONTROL SIMÜLATÖRÜ PRO - ANA BAŞLATICI
 // Sürüm: v2.0.0
 
+// basit kayıt yöneticisi
+class GameSaveManager {
+    constructor() {
+        this.key = 'qc_save_v1';
+        this.version = 1;
+        this.lastSave = 0;
+    }
+
+    save(state) {
+        const now = Date.now();
+        if (now - this.lastSave < 2000) return; // throttle
+        this.lastSave = now;
+        const data = { ...state, version: this.version, timestamp: now };
+        localStorage.setItem(this.key, JSON.stringify(data));
+    }
+
+    load() {
+        try {
+            const raw = localStorage.getItem(this.key);
+            if (!raw) return null;
+            const data = JSON.parse(raw);
+            if (data.version !== this.version) return null;
+            return data;
+        } catch (e) {
+            return null;
+        }
+    }
+
+    clear() {
+        localStorage.removeItem(this.key);
+    }
+}
+
+window.GameSaveManager = new GameSaveManager();
+
 class AppLoader {
     constructor() {
         this.game = null;
@@ -59,11 +94,23 @@ class AppLoader {
         
         // Ana oyun nesnesini oluştur
         this.game = new Game();
-        
+
         // Başlangıç ekranını göster
         const startScreen = document.getElementById('start-screen');
         if (startScreen) {
             startScreen.classList.remove('hidden');
+
+            const save = window.GameSaveManager.load();
+            const continueBtn = document.getElementById('continue-button');
+            if (save && continueBtn) {
+                continueBtn.classList.remove('hidden');
+                continueBtn.addEventListener('click', () => {
+                    this.game.loadState(save);
+                    this.game.uiManager.hideStartScreen();
+                    this.game.startGame();
+                    this.game.combo = save.combo || 0;
+                }, { once: true });
+            }
         }
         
         console.log('Oyun başarıyla yüklendi ve hazır!');
