@@ -744,6 +744,10 @@ canvas {
     transform: scale(1.1);
 }
 
+#pause-btn {
+    margin-left: 6px;
+}
+
 /* PARTİKÜL SİSTEMİ */
 .particle {
     position: absolute;

@@ -5,7 +5,7 @@ class SettingsManager {
             sound: { master: 1, effects: 1 },
             graphics: { videoBackground: true, quality: 'high' },
             accessibility: { colorFilter: 'none' },
-            language: localStorage.getItem('gameLanguage') || 'en'
+            language: localStorage.getItem('qc_currentLang') || 'en'
         };
         this.state = JSON.parse(localStorage.getItem('qc_settings') || 'null') || this.defaults;
         this.persist();

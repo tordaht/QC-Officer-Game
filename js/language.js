@@ -1,8 +1,22 @@
+// Basit pub/sub sistemi
+const EventBus = {
+    events: {},
+    subscribe(name, fn) {
+        (this.events[name] || (this.events[name] = [])).push(fn);
+    },
+    publish(name, data) {
+        (this.events[name] || []).forEach(fn => fn(data));
+    }
+};
+window.EventBus = EventBus;
+
 // ÇOK DİLLİ DESTEK SİSTEMİ
 class LanguageManager {
     constructor() {
-        this.currentLanguage = localStorage.getItem('gameLanguage') || 'en';
+        // load persisted language or default
+        this.currentLanguage = localStorage.getItem('qc_currentLang') || 'en';
         this.translations = {};
+        this.debounceTimer = null;
         this.loadTranslations();
     }
 
@@ -19,6 +33,7 @@ class LanguageManager {
             
             // BUTONLAR
             startGame: "START SHIFT",
+            continueGame: "CONTINUE",
             restartGame: "RESTART",
             soundToggle: "Sound",
             slowDown: "Slow Down",
@@ -163,6 +178,7 @@ class LanguageManager {
             
             // BUTONLAR
             startGame: "VARDİYA BAŞLAT",
+            continueGame: "DEVAM ET",
             restartGame: "YENİDEN BAŞLAT",
             soundToggle: "Ses",
             slowDown: "Yavaşlat",
@@ -297,9 +313,17 @@ class LanguageManager {
     }
 
     setLanguage(lang) {
-        this.currentLanguage = lang;
-        localStorage.setItem('gameLanguage', lang);
-        this.updateAllTexts();
+        clearTimeout(this.debounceTimer);
+        this.debounceTimer = setTimeout(() => {
+            if (this.currentLanguage === lang) return;
+            this.currentLanguage = lang;
+            // persist and update central config
+            localStorage.setItem('qc_currentLang', lang);
+            if (window.GameConfig) {
+                GameConfig.currentLang = lang;
+            }
+            this.updateAllTexts();
+        }, 100);
     }
 
     getCurrentLanguage() {
@@ -329,8 +353,8 @@ class LanguageManager {
     }
 
     updateAllTexts() {
-        // Bu fonksiyon tüm UI elementlerini güncelleyecek
-        document.dispatchEvent(new CustomEvent('languageChanged'));
+        // notify subscribers that language changed
+        EventBus.publish('languageChanged', this.currentLanguage);
     }
 }
 
