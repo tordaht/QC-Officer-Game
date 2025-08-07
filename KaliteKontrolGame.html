@@ -1,0 +1,1943 @@
+<!-- 
+    =====================================================================
+    ESKİ SÜRÜM YEDEK DOSYASI (v1.0.0)
+    Bu dosya artık kullanılmıyor. Yeni sürüm index.html'dir.
+    Sadece referans amaçlı saklanmıştır.
+    =====================================================================
+-->
+<!DOCTYPE html>
+<html lang="tr">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <title>Kalite Kontrol Simülatörü Pro (ESKİ SÜRÜM)</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Orbitron:wght@400;500;600;700&family=Roboto:wght@300;400;500;700&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <style>
+        /* TEMEL STİLLER VE RESET */
+        * {
+            box-sizing: border-box;
+            user-select: none;
+            margin: 0;
+            padding: 0;
+        }
+
+        body {
+            font-family: 'Roboto', sans-serif;
+            background: linear-gradient(135deg, #1a1a2e, #16213e, #0f3460);
+            color: #ecf0f1;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            min-height: 100vh;
+            overflow: hidden;
+            position: relative;
+        }
+
+        /* ARKA PLAN EFEKTLERİ */
+        .bg-animation {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            z-index: -1;
+            opacity: 0.3;
+        }
+
+        .bg-animation span {
+            position: absolute;
+            display: block;
+            width: 20px;
+            height: 20px;
+            background: rgba(255, 255, 255, 0.1);
+            animation: move 25s linear infinite;
+            bottom: -150px;
+        }
+
+        .bg-animation span:nth-child(1) {
+            left: 25%;
+            width: 80px;
+            height: 80px;
+            animation-delay: 0s;
+        }
+
+        .bg-animation span:nth-child(2) {
+            left: 10%;
+            width: 20px;
+            height: 20px;
+            animation-delay: 2s;
+            animation-duration: 12s;
+        }
+
+        .bg-animation span:nth-child(3) {
+            left: 70%;
+            width: 20px;
+            height: 20px;
+            animation-delay: 4s;
+        }
+
+        .bg-animation span:nth-child(4) {
+            left: 40%;
+            width: 60px;
+            height: 60px;
+            animation-delay: 0s;
+            animation-duration: 18s;
+        }
+
+        .bg-animation span:nth-child(5) {
+            left: 65%;
+            width: 20px;
+            height: 20px;
+            animation-delay: 0s;
+        }
+
+        .bg-animation span:nth-child(6) {
+            left: 75%;
+            width: 110px;
+            height: 110px;
+            animation-delay: 3s;
+        }
+
+        .bg-animation span:nth-child(7) {
+            left: 35%;
+            width: 150px;
+            height: 150px;
+            animation-delay: 7s;
+        }
+
+        .bg-animation span:nth-child(8) {
+            left: 50%;
+            width: 25px;
+            height: 25px;
+            animation-delay: 15s;
+            animation-duration: 45s;
+        }
+
+        .bg-animation span:nth-child(9) {
+            left: 20%;
+            width: 15px;
+            height: 15px;
+            animation-delay: 2s;
+            animation-duration: 35s;
+        }
+
+        .bg-animation span:nth-child(10) {
+            left: 85%;
+            width: 150px;
+            height: 150px;
+            animation-delay: 0s;
+            animation-duration: 11s;
+        }
+
+        @keyframes move {
+            0% {
+                transform: translateY(0) rotate(0deg);
+                opacity: 1;
+                border-radius: 0;
+            }
+            100% {
+                transform: translateY(-1000px) rotate(720deg);
+                opacity: 0;
+                border-radius: 50%;
+            }
+        }
+
+        /* OYUN KAPSAYICISI */
+        #game-container {
+            position: relative;
+            border: 5px solid #34495e;
+            border-radius: 15px;
+            box-shadow: 0 0 30px rgba(0, 0, 0, 0.7), 0 0 60px rgba(52, 152, 219, 0.3);
+            background-color: #1a252f;
+            overflow: hidden;
+            max-width: 100%;
+            max-height: 100vh;
+        }
+
+        canvas {
+            display: block;
+            background: linear-gradient(180deg, #1a252f 0%, #2c3e50 100%);
+        }
+        
+        /* ARAYÜZ (UI) ELEMANLARI */
+        .ui-element {
+            position: absolute;
+            background-color: rgba(44, 62, 80, 0.8);
+            backdrop-filter: blur(5px);
+            padding: 10px 15px;
+            border-radius: 8px;
+            font-size: 1.2em;
+            font-weight: bold;
+            text-shadow: 1px 1px 2px black;
+            box-shadow: 0 4px 8px rgba(0, 0, 0, 0.3);
+            border: 1px solid rgba(255, 255, 255, 0.1);
+            z-index: 5;
+        }
+
+        #score-display { 
+            top: 10px; 
+            right: 10px; 
+            font-family: 'Orbitron', sans-serif;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+
+        #timer-display { 
+            top: 10px; 
+            left: 10px; 
+            font-family: 'Orbitron', sans-serif;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+
+        #level-display { 
+            top: 10px; 
+            left: 50%; 
+            transform: translateX(-50%);
+            font-family: 'Orbitron', sans-serif;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+
+        #combo-display { 
+            bottom: 80px; 
+            left: 50%; 
+            transform: translateX(-50%);
+            font-size: 1.8em;
+            color: #f1c40f;
+            background-color: transparent;
+            text-align: center;
+            font-family: 'Orbitron', sans-serif;
+            text-shadow: 0 0 10px rgba(241, 196, 15, 0.7);
+            z-index: 6;
+        }
+
+        /* GÜÇLENDİRİCİ BUTONLARI */
+        #powerup-container {
+            position: absolute;
+            bottom: 15px;
+            left: 50%;
+            transform: translateX(-50%);
+            display: flex;
+            gap: 15px;
+            z-index: 5;
+        }
+
+        .powerup-btn {
+            padding: 12px 20px;
+            font-size: 1em;
+            font-weight: bold;
+            color: white;
+            border: 2px solid #7f8c8d;
+            border-radius: 10px;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            font-family: 'Orbitron', sans-serif;
+            position: relative;
+            overflow: hidden;
+        }
+
+        .powerup-btn:before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: -100%;
+            width: 100%;
+            height: 100%;
+            background: linear-gradient(90deg, transparent, rgba(255,255,255,0.2), transparent);
+            transition: left 0.5s;
+        }
+
+        .powerup-btn:hover:before {
+            left: 100%;
+        }
+
+        #slowmo-btn { 
+            background: linear-gradient(135deg, #2980b9, #3498db);
+            box-shadow: 0 4px 10px rgba(41, 128, 185, 0.4);
+        }
+
+        #xray-btn { 
+            background: linear-gradient(135deg, #27ae60, #2ecc71);
+            box-shadow: 0 4px 10px rgba(39, 174, 96, 0.4);
+        }
+
+        .powerup-btn:hover:not(:disabled) { 
+            transform: translateY(-3px); 
+            box-shadow: 0 6px 12px rgba(0,0,0,0.4);
+        }
+
+        .powerup-btn:disabled {
+            background: linear-gradient(135deg, #7f8c8d, #95a5a6);
+            cursor: not-allowed;
+            opacity: 0.6;
+            box-shadow: none;
+        }
+
+        /* EKRAN KATMANLARI (BAŞLANGIÇ, OYUN BİTTİ) */
+        .screen-overlay {
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: linear-gradient(135deg, rgba(0, 0, 0, 0.9), rgba(26, 37, 47, 0.9));
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            align-items: center;
+            text-align: center;
+            z-index: 20;
+            backdrop-filter: blur(5px);
+        }
+
+        .screen-overlay h1 { 
+            font-size: 3.5em; 
+            margin-bottom: 20px; 
+            color: #e74c3c;
+            font-family: 'Orbitron', sans-serif;
+            text-transform: uppercase;
+            letter-spacing: 2px;
+            text-shadow: 0 0 15px rgba(231, 76, 60, 0.7);
+        }
+
+        .screen-overlay p { 
+            font-size: 1.3em; 
+            max-width: 80%; 
+            margin-bottom: 20px;
+            line-height: 1.6;
+        }
+
+        .screen-overlay button {
+            margin-top: 20px;
+            padding: 15px 40px;
+            font-size: 1.5em;
+            font-weight: bold;
+            color: #ecf0f1;
+            background: linear-gradient(135deg, #c0392b, #e74c3c);
+            border: none;
+            border-radius: 10px;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            font-family: 'Orbitron', sans-serif;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+            box-shadow: 0 4px 15px rgba(192, 57, 43, 0.4);
+            position: relative;
+            overflow: hidden;
+        }
+
+        .screen-overlay button:before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: -100%;
+            width: 100%;
+            height: 100%;
+            background: linear-gradient(90deg, transparent, rgba(255,255,255,0.2), transparent);
+            transition: left 0.5s;
+        }
+
+        .screen-overlay button:hover:before {
+            left: 100%;
+        }
+
+        .screen-overlay button:hover { 
+            transform: translateY(-3px);
+            box-shadow: 0 6px 20px rgba(192, 57, 43, 0.6);
+        }
+
+        /* YÜZEN PUAN YAZILARI İÇİN ANİMASYON */
+        .floating-text {
+            position: absolute;
+            pointer-events: none;
+            font-size: 1.8em;
+            font-weight: bold;
+            animation: float-up 1.5s forwards ease-out;
+            z-index: 15;
+            font-family: 'Orbitron', sans-serif;
+            text-shadow: 0 0 10px currentColor;
+        }
+
+        @keyframes float-up {
+            0% { 
+                transform: translateY(0) scale(0.8); 
+                opacity: 1; 
+            }
+            50% { 
+                transform: translateY(-30px) scale(1.2); 
+                opacity: 1; 
+            }
+            100% { 
+                transform: translateY(-70px) scale(1); 
+                opacity: 0; 
+            }
+        }
+
+        /* DİKKAT DAĞITICI EFEKTLER */
+        .shake {
+            animation: shake-animation 0.5s infinite;
+        }
+
+        @keyframes shake-animation {
+            0% { transform: translate(1px, 1px) rotate(0deg); }
+            10% { transform: translate(-1px, -2px) rotate(-1deg); }
+            20% { transform: translate(-3px, 0px) rotate(1deg); }
+            30% { transform: translate(3px, 2px) rotate(0deg); }
+            40% { transform: translate(1px, -1px) rotate(1deg); }
+            50% { transform: translate(-1px, 2px) rotate(-1deg); }
+            60% { transform: translate(-3px, 1px) rotate(0deg); }
+            70% { transform: translate(3px, 1px) rotate(-1deg); }
+            80% { transform: translate(-1px, -1px) rotate(1deg); }
+            90% { transform: translate(1px, 2px) rotate(0deg); }
+            100% { transform: translate(1px, -2px) rotate(-1deg); }
+        }
+
+        .xray-active canvas {
+            filter: invert(1) hue-rotate(180deg) contrast(1.2);
+        }
+
+        .hidden { display: none !important; }
+
+        /* Bant flaş efektleri için */
+        .flicker {
+            animation: flicker-animation 0.4s forwards;
+        }
+
+        @keyframes flicker-animation {
+            0%, 100% { filter: brightness(1); }
+            50% { filter: brightness(1.7); }
+        }
+
+        /* ZAMAN BARı */
+        #time-bar-container {
+            position: absolute;
+            bottom: 80px;
+            left: 50%;
+            transform: translateX(-50%);
+            width: 70%;
+            height: 12px;
+            background-color: rgba(52, 73, 94, 0.7);
+            border-radius: 10px;
+            overflow: hidden;
+            box-shadow: inset 0 0 10px rgba(0, 0, 0, 0.5);
+            z-index: 4;
+            border: 1px solid rgba(255, 255, 255, 0.1);
+        }
+
+        #time-bar-fill {
+            height: 100%;
+            width: 100%;
+            background: linear-gradient(90deg, #2ecc71, #27ae60);
+            transition: width 0.2s linear;
+            box-shadow: 0 0 10px rgba(46, 204, 113, 0.7);
+        }
+
+        /* INTRO EKRANI */
+        #intro-screen {
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: linear-gradient(135deg, #1a1a2e, #16213e, #0f3460);
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            align-items: center;
+            z-index: 30;
+            overflow: hidden;
+        }
+
+        .intro-logo {
+            font-size: 4em;
+            font-weight: bold;
+            margin-bottom: 30px;
+            font-family: 'Orbitron', sans-serif;
+            color: #3498db;
+            text-transform: uppercase;
+            letter-spacing: 3px;
+            text-shadow: 0 0 20px rgba(52, 152, 219, 0.7);
+            animation: pulse 2s infinite;
+        }
+
+        @keyframes pulse {
+            0% { transform: scale(1); }
+            50% { transform: scale(1.05); }
+            100% { transform: scale(1); }
+        }
+
+        .intro-subtitle {
+            font-size: 1.5em;
+            margin-bottom: 50px;
+            color: #ecf0f1;
+            font-weight: 300;
+        }
+
+        .intro-loader {
+            width: 200px;
+            height: 4px;
+            background-color: rgba(255, 255, 255, 0.1);
+            border-radius: 2px;
+            overflow: hidden;
+            margin-bottom: 30px;
+        }
+
+        .intro-loader-bar {
+            height: 100%;
+            width: 0;
+            background: linear-gradient(90deg, #3498db, #2ecc71);
+            border-radius: 2px;
+            animation: loading 3s forwards;
+        }
+
+        @keyframes loading {
+            0% { width: 0; }
+            100% { width: 100%; }
+        }
+
+        .intro-tip {
+            font-size: 1em;
+            color: #95a5a6;
+            font-style: italic;
+            margin-top: 20px;
+        }
+
+        /* OYUN İSTATİSTİKLERİ */
+        #stats-container {
+            position: absolute;
+            top: 60px;
+            right: 10px;
+            background-color: rgba(44, 62, 80, 0.8);
+            backdrop-filter: blur(5px);
+            padding: 10px;
+            border-radius: 8px;
+            font-size: 0.9em;
+            box-shadow: 0 4px 8px rgba(0, 0, 0, 0.3);
+            border: 1px solid rgba(255, 255, 255, 0.1);
+            z-index: 5;
+            min-width: 150px;
+        }
+
+        .stat-item {
+            display: flex;
+            justify-content: space-between;
+            margin-bottom: 5px;
+        }
+
+        .stat-label {
+            color: #95a5a6;
+        }
+
+        .stat-value {
+            font-weight: bold;
+            font-family: 'Orbitron', sans-serif;
+        }
+
+        /* BAŞARIM KARTLARI */
+        .achievement {
+            position: absolute;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%) scale(0);
+            background: linear-gradient(135deg, rgba(241, 196, 15, 0.9), rgba(243, 156, 18, 0.9));
+            color: #1a1a2e;
+            padding: 20px;
+            border-radius: 10px;
+            box-shadow: 0 0 30px rgba(241, 196, 15, 0.7);
+            z-index: 25;
+            text-align: center;
+            animation: achievement-pop 3s forwards;
+            max-width: 80%;
+        }
+
+        @keyframes achievement-pop {
+            0% { transform: translate(-50%, -50%) scale(0); opacity: 0; }
+            20% { transform: translate(-50%, -50%) scale(1.1); opacity: 1; }
+            30% { transform: translate(-50%, -50%) scale(1); opacity: 1; }
+            80% { transform: translate(-50%, -50%) scale(1); opacity: 1; }
+            100% { transform: translate(-50%, -50%) scale(0); opacity: 0; }
+        }
+
+        .achievement-title {
+            font-size: 1.5em;
+            font-weight: bold;
+            margin-bottom: 10px;
+            font-family: 'Orbitron', sans-serif;
+        }
+
+        .achievement-desc {
+            font-size: 1em;
+        }
+
+        /* MOBİL KONTROLLER */
+        .mobile-controls {
+            display: none;
+            position: absolute;
+            bottom: 80px;
+            width: 100%;
+            justify-content: space-between;
+            padding: 0 20px;
+            z-index: 10;
+        }
+
+        .mobile-btn {
+            width: 60px;
+            height: 60px;
+            border-radius: 50%;
+            background: rgba(52, 73, 94, 0.8);
+            backdrop-filter: blur(5px);
+            border: 2px solid rgba(255, 255, 255, 0.2);
+            color: white;
+            font-size: 1.5em;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            box-shadow: 0 4px 10px rgba(0, 0, 0, 0.3);
+        }
+
+        /* SES KONTROLÜ */
+        #sound-control {
+            position: absolute;
+            top: 10px;
+            left: 50%;
+            transform: translateX(-50%);
+            margin-top: 40px;
+            z-index: 5;
+        }
+
+        .sound-btn {
+            background: rgba(44, 62, 80, 0.8);
+            backdrop-filter: blur(5px);
+            border: 1px solid rgba(255, 255, 255, 0.1);
+            color: white;
+            width: 40px;
+            height: 40px;
+            border-radius: 50%;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            cursor: pointer;
+            box-shadow: 0 4px 8px rgba(0, 0, 0, 0.3);
+            transition: all 0.3s ease;
+        }
+
+        .sound-btn:hover {
+            background: rgba(52, 73, 94, 0.9);
+            transform: scale(1.1);
+        }
+
+        /* PARTİKÜL SİSTEMİ */
+        .particle {
+            position: absolute;
+            pointer-events: none;
+            opacity: 0;
+            z-index: 10;
+        }
+
+        /* MEDYA SORGULARI - MOBİL UYUM */
+        @media (max-width: 768px) {
+            .screen-overlay h1 { font-size: 2.5em; }
+            .screen-overlay p { font-size: 1.1em; }
+            .screen-overlay button { padding: 12px 30px; font-size: 1.2em; }
+            #powerup-container { gap: 10px; }
+            .powerup-btn { padding: 10px 15px; font-size: 0.9em; }
+            .mobile-controls { display: flex; }
+            .intro-logo { font-size: 3em; }
+            .intro-subtitle { font-size: 1.2em; }
+            #stats-container { 
+                top: auto; 
+                bottom: 150px; 
+                right: 10px; 
+                font-size: 0.8em; 
+            }
+        }
+
+        @media (max-width: 480px) {
+            .screen-overlay h1 { font-size: 2em; }
+            .screen-overlay p { font-size: 1em; }
+            .screen-overlay button { padding: 10px 20px; font-size: 1em; }
+            .intro-logo { font-size: 2.5em; }
+            .intro-subtitle { font-size: 1em; }
+            .ui-element { font-size: 1em; padding: 8px 12px; }
+            #combo-display { font-size: 1.5em; }
+        }
+
+        /* YÜKSEME EKRANI */
+        .loader-container {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: linear-gradient(135deg, #1a1a2e, #16213e, #0f3460);
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            align-items: center;
+            z-index: 100;
+        }
+
+        .loader {
+            width: 100px;
+            height: 100px;
+            border-radius: 50%;
+            border: 10px solid rgba(255, 255, 255, 0.1);
+            border-top-color: #3498db;
+            animation: spin 1s linear infinite;
+            margin-bottom: 20px;
+        }
+
+        @keyframes spin {
+            0% { transform: rotate(0deg); }
+            100% { transform: rotate(360deg); }
+        }
+
+        .loader-text {
+            font-size: 1.5em;
+            color: #ecf0f1;
+            font-family: 'Orbitron', sans-serif;
+        }
+    </style>
+</head>
+<body>
+    <!-- YÜKLEME EKRANI -->
+    <div id="loader" class="loader-container">
+        <div class="loader"></div>
+        <div class="loader-text">YÜKLENİYOR...</div>
+    </div>
+
+    <!-- ARKA PLAN ANİMASYONU -->
+    <div class="bg-animation">
+        <span></span>
+        <span></span>
+        <span></span>
+        <span></span>
+        <span></span>
+        <span></span>
+        <span></span>
+        <span></span>
+        <span></span>
+        <span></span>
+    </div>
+
+    <div id="game-container">
+        <canvas id="game-canvas"></canvas>
+        
+        <!-- Arayüz Elemanları -->
+        <div id="score-display" class="ui-element">
+            <i class="fas fa-star"></i>
+            <span>Puan: 0</span>
+        </div>
+        <div id="timer-display" class="ui-element">
+            <i class="fas fa-clock"></i>
+            <span>Süre: 60</span>
+        </div>
+        <div id="level-display" class="ui-element">
+            <i class="fas fa-layer-group"></i>
+            <span>Bölüm: 1</span>
+        </div>
+        <div id="combo-display" class="ui-element"></div>
+
+        <!-- Ses Kontrolü -->
+        <div id="sound-control">
+            <button class="sound-btn" id="sound-toggle">
+                <i class="fas fa-volume-up"></i>
+            </button>
+        </div>
+
+        <!-- Oyun İstatistikleri -->
+        <div id="stats-container">
+            <div class="stat-item">
+                <span class="stat-label">Doğru:</span>
+                <span class="stat-value" id="correct-count">0</span>
+            </div>
+            <div class="stat-item">
+                <span class="stat-label">Yanlış:</span>
+                <span class="stat-value" id="incorrect-count">0</span>
+            </div>
+            <div class="stat-item">
+                <span class="stat-label">Doğruluk:</span>
+                <span class="stat-value" id="accuracy-rate">0%</span>
+            </div>
+        </div>
+
+        <!-- Zaman Çubuğu -->
+        <div id="time-bar-container">
+            <div id="time-bar-fill"></div>
+        </div>
+        
+        <div id="powerup-container">
+            <button id="slowmo-btn" class="powerup-btn">
+                <i class="fas fa-tachometer-alt"></i>
+                <span>Yavaşlat (1)</span>
+            </button>
+            <button id="xray-btn" class="powerup-btn">
+                <i class="fas fa-eye"></i>
+                <span>X-Ray (1)</span>
+            </button>
+        </div>
+
+        <!-- Mobil Kontroller -->
+        <div class="mobile-controls">
+            <button class="mobile-btn" id="mobile-left">
+                <i class="fas fa-chevron-left"></i>
+            </button>
+            <button class="mobile-btn" id="mobile-right">
+                <i class="fas fa-chevron-right"></i>
+            </button>
+        </div>
+
+        <!-- Intro Ekranı -->
+        <div id="intro-screen" class="screen-overlay">
+            <div class="intro-logo">Kalite Kontrol</div>
+            <div class="intro-subtitle">Pro Simülatör</div>
+            <div class="intro-loader">
+                <div class="intro-loader-bar"></div>
+            </div>
+            <div class="intro-tip">İpucu: Hatalı ürünleri tespit ederek puan kazanın!</div>
+        </div>
+
+        <!-- Başlangıç Ekranı -->
+        <div id="start-screen" class="screen-overlay hidden">
+            <h1>Kalite Kontrol</h1>
+            <p>Şirketimizin üretim bandından geçen ürünleri kontrol etmelisin. Hatalı şişeleri tespit edip banttan ayıklamalısın. Doğru tespitler puan kazandırır, hatalar ise puan kaybettirir. Dikkatli olun, bant hızı ve zorluklar artacak!</p>
+            <p><strong>Hikaye:</strong> Yeni bir kalite kontrol uzmanısın. Şirketin itibarını korumak ve müşteri memnuniyetini sağlamak için ürünlerin kalitesini kontrol etmen gerekiyor. Her seviyede daha zorlu görevler seni bekliyor!</p>
+            <button id="start-button">BAŞLA</button>
+        </div>
+
+        <!-- Oyun Bitti Ekranı -->
+        <div id="gameover-screen" class="screen-overlay hidden">
+            <h1>Oyun Bitti!</h1>
+            <p id="final-score"></p>
+            <p id="game-result-message"></p>
+            <p id="high-score-display"></p>
+            <div id="final-stats"></div>
+            <button id="restart-button">YENİDEN BAŞLA</button>
+        </div>
+        
+         <!-- Seviye Geçiş Ekranı -->
+        <div id="level-transition-screen" class="screen-overlay hidden">
+            <h1 id="transition-level-title"></h1>
+            <p id="transition-level-message"></p>
+            <div id="level-stats"></div>
+        </div>
+    </div>
+
+    <script>
+        document.addEventListener('DOMContentLoaded', () => {
+            // YÜKLEME EKRANI
+            window.addEventListener('load', () => {
+                setTimeout(() => {
+                    document.getElementById('loader').style.display = 'none';
+                    
+                    // İNTRO EKRANI
+                    setTimeout(() => {
+                        document.getElementById('intro-screen').style.display = 'none';
+                        document.getElementById('start-screen').classList.remove('hidden');
+                    }, 3000);
+                }, 1500);
+            });
+
+            // SES SİSTEMİ
+            const SoundManager = {
+                enabled: true,
+                context: null,
+                sounds: {},
+                
+                init() {
+                    try {
+                        window.AudioContext = window.AudioContext || window.webkitAudioContext;
+                        this.context = new AudioContext();
+                        
+                        // Ses efektleri oluştur
+                        this.createSound('click', 200, 0.1, 'square');
+                        this.createSound('correct', 523.25, 0.2, 'sine');
+                        this.createSound('wrong', 130.81, 0.3, 'sawtooth');
+                        this.createSound('powerup', 659.25, 0.3, 'sine');
+                        this.createSound('levelup', 783.99, 0.5, 'sine');
+                        this.createSound('combo', 1046.50, 0.4, 'sine');
+                    } catch (e) {
+                        console.log('Ses sistemi başlatılamadı:', e);
+                        this.enabled = false;
+                    }
+                },
+                
+                createSound(name, frequency, duration, type = 'sine') {
+                    if (!this.enabled) return;
+                    
+                    this.sounds[name] = () => {
+                        if (!this.enabled) return;
+                        
+                        const oscillator = this.context.createOscillator();
+                        const gainNode = this.context.createGain();
+                        
+                        oscillator.connect(gainNode);
+                        gainNode.connect(this.context.destination);
+                        
+                        oscillator.type = type;
+                        oscillator.frequency.value = frequency;
+                        
+                        gainNode.gain.setValueAtTime(0.3, this.context.currentTime);
+                        gainNode.gain.exponentialRampToValueAtTime(0.01, this.context.currentTime + duration);
+                        
+                        oscillator.start(this.context.currentTime);
+                        oscillator.stop(this.context.currentTime + duration);
+                    };
+                },
+                
+                play(name) {
+                    if (this.sounds[name]) {
+                        this.sounds[name]();
+                    }
+                },
+                
+                toggle() {
+                    this.enabled = !this.enabled;
+                    const icon = document.querySelector('#sound-toggle i');
+                    icon.className = this.enabled ? 'fas fa-volume-up' : 'fas fa-volume-mute';
+                }
+            };
+
+            // PARTİKÜL SİSTEMİ
+            class ParticleSystem {
+                constructor(container) {
+                    this.container = container;
+                    this.particles = [];
+                }
+                
+                create(x, y, color, count = 10) {
+                    for (let i = 0; i < count; i++) {
+                        const particle = document.createElement('div');
+                        particle.className = 'particle';
+                        
+                        const size = Math.random() * 8 + 4;
+                        const angle = Math.random() * Math.PI * 2;
+                        const speed = Math.random() * 50 + 30;
+                        const lifetime = Math.random() * 0.5 + 0.5;
+                        
+                        particle.style.width = `${size}px`;
+                        particle.style.height = `${size}px`;
+                        particle.style.backgroundColor = color;
+                        particle.style.borderRadius = '50%';
+                        particle.style.left = `${x}px`;
+                        particle.style.top = `${y}px`;
+                        particle.style.opacity = '1';
+                        
+                        this.container.appendChild(particle);
+                        
+                        // Animasyon
+                        let startTime = null;
+                        const animate = (timestamp) => {
+                            if (!startTime) startTime = timestamp;
+                            const progress = (timestamp - startTime) / 1000 / lifetime;
+                            
+                            if (progress < 1) {
+                                const currentX = x + Math.cos(angle) * speed * progress * 20;
+                                const currentY = y + Math.sin(angle) * speed * progress * 20 - 100 * progress;
+                                
+                                particle.style.left = `${currentX}px`;
+                                particle.style.top = `${currentY}px`;
+                                particle.style.opacity = 1 - progress;
+                                particle.style.transform = `scale(${1 - progress * 0.5})`;
+                                
+                                requestAnimationFrame(animate);
+                            } else {
+                                particle.remove();
+                            }
+                        };
+                        
+                        requestAnimationFrame(animate);
+                    }
+                }
+            }
+
+            // BAŞARIM SİSTEMİ
+            const AchievementSystem = {
+                achievements: [
+                    { id: 'first_blood', title: 'İlk Kan', desc: 'İlk hatalı ürünü buldun!', condition: () => stats.correct >= 1 },
+                    { id: 'combo_5', title: '5x Kombo', desc: '5 ürün üst üste doğru tespit!', condition: () => combo >= 5 },
+                    { id: 'combo_10', title: '10x Kombo', desc: '10 ürün üst üste doğru tespit!', condition: () => combo >= 10 },
+                    { id: 'combo_20', title: '20x Kombo', desc: '20 ürün üst üste doğru tespit!', condition: () => combo >= 20 },
+                    { id: 'level_5', title: 'Deneyimli', desc: '5. seviyeye ulaştın!', condition: () => currentLevel >= 5 },
+                    { id: 'level_10', title: 'Uzman', desc: '10. seviyeye ulaştın!', condition: () => currentLevel >= 10 },
+                    { id: 'level_15', title: 'Usta', desc: '15. seviyeye ulaştın!', condition: () => currentLevel >= 15 },
+                    { id: 'level_20', title: 'Efsane', desc: '20. seviyeye ulaştın!', condition: () => currentLevel >= 20 },
+                    { id: 'score_500', title: 'Başlangıç', desc: '500 puana ulaştın!', condition: () => score >= 500 },
+                    { id: 'score_1000', title: 'Yetenekli', desc: '1000 puana ulaştın!', condition: () => score >= 1000 },
+                    { id: 'score_2000', title: 'Profesyonel', desc: '2000 puana ulaştın!', condition: () => score >= 2000 },
+                    { id: 'score_5000', title: 'Deha', desc: '5000 puana ulaştın!', condition: () => score >= 5000 },
+                    { id: 'accuracy_80', title: 'Keskin Göz', desc: '%80 doğruluk oranı!', condition: () => stats.total > 0 && (stats.correct / stats.total) >= 0.8 },
+                    { id: 'accuracy_90', title: 'Kartal Gözü', desc: '%90 doğruluk oranı!', condition: () => stats.total > 0 && (stats.correct / stats.total) >= 0.9 },
+                    { id: 'accuracy_95', title: 'Mükemmel', desc: '%95 doğruluk oranı!', condition: () => stats.total > 0 && (stats.correct / stats.total) >= 0.95 },
+                    { id: 'no_mistakes', title: 'Kusursuz', desc: 'Bir seviyede hiç hata yapmadan bitir!', condition: () => stats.levelMistakes === 0 && gameState === 'transition' },
+                    { id: 'speed_demon', title: 'Hız Canavarı', desc: 'En hızlı seviyeyi tamamla!', condition: () => false, // Özel durumda kontrol edilecek
+                    }
+                ],
+                unlocked: [],
+                
+                check() {
+                    this.achievements.forEach(achievement => {
+                        if (!this.unlocked.includes(achievement.id) && achievement.condition()) {
+                            this.unlock(achievement);
+                        }
+                    });
+                },
+                
+                unlock(achievement) {
+                    this.unlocked.push(achievement.id);
+                    
+                    const achievementEl = document.createElement('div');
+                    achievementEl.className = 'achievement';
+                    achievementEl.innerHTML = `
+                        <div class="achievement-title">${achievement.title}</div>
+                        <div class="achievement-desc">${achievement.desc}</div>
+                    `;
+                    
+                    gameContainer.appendChild(achievementEl);
+                    
+                    SoundManager.play('achievement');
+                    
+                    setTimeout(() => {
+                        achievementEl.remove();
+                    }, 3000);
+                }
+            };
+
+            // DOM ELEMANLARI
+            const canvas = document.getElementById('game-canvas');
+            const ctx = canvas.getContext('2d');
+            const gameContainer = document.getElementById('game-container');
+            
+            // UI Elemanları
+            const scoreDisplay = document.getElementById('score-display');
+            const timerDisplay = document.getElementById('timer-display');
+            const levelDisplay = document.getElementById('level-display');
+            const comboDisplay = document.getElementById('combo-display');
+            const timeBarFill = document.getElementById('time-bar-fill');
+            const timeBarContainer = document.getElementById('time-bar-container');
+            const highScoreDisplay = document.getElementById('high-score-display');
+            const correctCountDisplay = document.getElementById('correct-count');
+            const incorrectCountDisplay = document.getElementById('incorrect-count');
+            const accuracyRateDisplay = document.getElementById('accuracy-rate');
+            const finalStatsDisplay = document.getElementById('final-stats');
+            const levelStatsDisplay = document.getElementById('level-stats');
+            
+            // Yerel yüksek skor depolama
+            let highScore = parseInt(localStorage.getItem('qualityHighScore') || '0');
+            let unlockedAchievements = JSON.parse(localStorage.getItem('unlockedAchievements') || '[]');
+            
+            // Butonlar ve Ekranlar
+            const startButton = document.getElementById('start-button');
+            const restartButton = document.getElementById('restart-button');
+            const slowmoBtn = document.getElementById('slowmo-btn');
+            const xrayBtn = document.getElementById('xray-btn');
+            const soundToggle = document.getElementById('sound-toggle');
+            const mobileLeftBtn = document.getElementById('mobile-left');
+            const mobileRightBtn = document.getElementById('mobile-right');
+
+            const startScreen = document.getElementById('start-screen');
+            const gameoverScreen = document.getElementById('gameover-screen');
+            const levelTransitionScreen = document.getElementById('level-transition-screen');
+            const finalScoreDisplay = document.getElementById('final-score');
+            const gameResultMessage = document.getElementById('game-result-message');
+            
+            // OYUN AYARLARI VE DEĞİŞKENLERİ
+            let bottles = [];
+            let score = 0;
+            let currentLevel = 0;
+            let timeLeft = 0;
+            let combo = 0;
+            let gameState = 'menu'; // 'menu', 'playing', 'paused', 'gameover', 'transition'
+            let lastTime = 0;
+            let spawnTimer = 0;
+            
+            let powerups = { slowmo: 1, xray: 1 };
+            let activePowerups = { slowmo: null, xray: null };
+            
+            // Oyun istatistikleri
+            let stats = {
+                correct: 0,
+                incorrect: 0,
+                total: 0,
+                levelStart: 0,
+                levelMistakes: 0,
+                levelTime: 0
+            };
+            
+            // Titreme (shake) interval listesini takip et
+            let shakeIntervals = [];
+            
+            // Partikül sistemi
+            const particleSystem = new ParticleSystem(gameContainer);
+            
+            // Mobil kontrol değişkenleri
+            let mobileControlActive = false;
+            let mobileControlDirection = 0;
+
+            /**
+             * Bir hex renk değerini daha açık veya koyu hale getirir.
+             * @param {string} col Renk (örn. "#76c7c0")
+             * @param {number} percent Pozitif değerler rengi açar, negatif değerler koyulaştırır.
+             * @returns {string} Yeni hex renk.
+             */
+            function shadeColor(col, percent) {
+                let num = parseInt(col.replace('#', ''), 16);
+                let r = (num >> 16);
+                let g = (num >> 8) & 0x00FF;
+                let b = num & 0x0000FF;
+                r = Math.min(255, Math.max(0, r + (percent / 100) * 255));
+                g = Math.min(255, Math.max(0, g + (percent / 100) * 255));
+                b = Math.min(255, Math.max(0, b + (percent / 100) * 255));
+                return '#' + ((1 << 24) + (Math.round(r) << 16) + (Math.round(g) << 8) + Math.round(b)).toString(16).slice(1);
+            }
+
+            // SEVİYE YAPILANDIRMASI
+            // Yeni seviyeler buraya eklenebilir.
+            const levelConfig = [
+                // 1–5: Başlangıç seviyeleri, temel akış
+                { 
+                    duration: 45, 
+                    speed: 100, 
+                    faultyChance: 0.15, 
+                    spawnRate: 1500, 
+                    distractions: {},
+                    name: "İşe Başlangıç",
+                    description: "Kalite kontrol uzmanı olarak ilk günün. Temel becerilerini göster!"
+                },
+                { 
+                    duration: 45, 
+                    speed: 110, 
+                    faultyChance: 0.18, 
+                    spawnRate: 1400, 
+                    distractions: {},
+                    name: "Ritim Bulma",
+                    description: "Artık daha hızlı çalışmalısın. Ürünler daha hızlı akıyor!"
+                },
+                { 
+                    duration: 50, 
+                    speed: 120, 
+                    faultyChance: 0.20, 
+                    spawnRate: 1300, 
+                    distractions: {},
+                    name: "Dikkatli Ol",
+                    description: "Hata oranı artıyor. Daha dikkatli olmalısın!"
+                },
+                { 
+                    duration: 50, 
+                    speed: 130, 
+                    faultyChance: 0.23, 
+                    spawnRate: 1250, 
+                    distractions: {},
+                    name: "Hız Artıyor",
+                    description: "Bant hızı artıyor. Gözlerini dört aç!"
+                },
+                { 
+                    duration: 55, 
+                    speed: 140, 
+                    faultyChance: 0.25, 
+                    spawnRate: 1150, 
+                    distractions: {},
+                    name: "Deneyim Kazan",
+                    description: "Artık deneyimli bir kontrol uzmanısın. Kendini kanıtlama zamanı!"
+                },
+                // 6–10: Hız artışı ve titreşimler
+                { 
+                    duration: 60, 
+                    speed: 150, 
+                    faultyChance: 0.27, 
+                    spawnRate: 1050, 
+                    distractions: { shake: true, shakeFrequency: 6000 },
+                    name: "Titreşen Zemin",
+                    description: "Makinede titreşimler başladı. Dengeyi koru!"
+                },
+                { 
+                    duration: 60, 
+                    speed: 160, 
+                    faultyChance: 0.30, 
+                    spawnRate: 1000, 
+                    distractions: { shake: true, shakeFrequency: 5000 },
+                    name: "Sarsıntı Artıyor",
+                    description: "Titreşimler daha şiddetli. Odaklanmayı sürdür!"
+                },
+                { 
+                    duration: 60, 
+                    speed: 170, 
+                    faultyChance: 0.32, 
+                    spawnRate: 950, 
+                    distractions: { bandFlicker: true },
+                    name: "Işık Oyunları",
+                    description: "Bant ışıkları anlık olarak parlıyor. Gözlerini kamaştırma!"
+                },
+                { 
+                    duration: 65, 
+                    speed: 180, 
+                    faultyChance: 0.34, 
+                    spawnRate: 900, 
+                    distractions: { shake: true, shakeFrequency: 4500 },
+                    name: "Çift Zorluk",
+                    description: "Hem titreşim hem de hız arttı. Profesyonellik testi!"
+                },
+                { 
+                    duration: 65, 
+                    speed: 190, 
+                    faultyChance: 0.36, 
+                    spawnRate: 850, 
+                    distractions: { randomStop: true, stopChance: 0.02 },
+                    name: "Ani Duruşlar",
+                    description: "Bant aniden durabiliyor. Hazırlıklı ol!"
+                },
+                // 11–15: Dikkat dağıtıcılar ve rastgele duraksamalar
+                { 
+                    duration: 70, 
+                    speed: 200, 
+                    faultyChance: 0.38, 
+                    spawnRate: 800, 
+                    distractions: { randomStop: true, stopChance: 0.025 },
+                    name: "Beklenmedik Duruşlar",
+                    description: "Bant daha sık duruyor. Zamanlamana dikkat et!"
+                },
+                { 
+                    duration: 70, 
+                    speed: 210, 
+                    faultyChance: 0.40, 
+                    spawnRate: 780, 
+                    distractions: { shake: true, shakeFrequency: 4000 },
+                    name: "Sürekli Titreşim",
+                    description: "Titreşimler daha sık ve şiddetli. Dengeni kaybetme!"
+                },
+                { 
+                    duration: 70, 
+                    speed: 220, 
+                    faultyChance: 0.42, 
+                    spawnRate: 760, 
+                    distractions: { randomStop: true, stopChance: 0.03, bandFlicker: true },
+                    name: "Kaotik Ortam",
+                    description: "Her şey bir arada! Titreşim, duruş ve ışık oyunları..."
+                },
+                { 
+                    duration: 75, 
+                    speed: 230, 
+                    faultyChance: 0.44, 
+                    spawnRate: 740, 
+                    distractions: { randomStop: true, stopChance: 0.03 },
+                    name: "Hız ve Duruş",
+                    description: "Maksimum hızda çalışırken ani duruşlara hazır ol!"
+                },
+                { 
+                    duration: 75, 
+                    speed: 240, 
+                    faultyChance: 0.46, 
+                    spawnRate: 720, 
+                    distractions: { shake: true, shakeFrequency: 3500 },
+                    name: "Ustalık Seviyesi",
+                    description: "Artık bir ustasın. En zor koşullarda test ediliyorsun!"
+                },
+                // 16–20: Son seviyeler, yoğun tempo ve çoklu dikkat dağıtıcılar
+                { 
+                    duration: 80, 
+                    speed: 250, 
+                    faultyChance: 0.48, 
+                    spawnRate: 700, 
+                    distractions: { randomStop: true, stopChance: 0.04 },
+                    name: "Sınırda",
+                    description: "Hızın ve zorluğun sınırlarda olduğu seviye!"
+                },
+                { 
+                    duration: 80, 
+                    speed: 260, 
+                    faultyChance: 0.50, 
+                    spawnRate: 680, 
+                    distractions: { bandFlicker: true, shake: true, shakeFrequency: 3200 },
+                    name: "Kaosun Ortasında",
+                    description: "Tüm dikkat dağıtıcılar bir arada. Gerçek bir meydan okuma!"
+                },
+                { 
+                    duration: 80, 
+                    speed: 270, 
+                    faultyChance: 0.52, 
+                    spawnRate: 660, 
+                    distractions: { randomStop: true, stopChance: 0.045 },
+                    name: "Zamanla Yarış",
+                    description: "Süre daralıyor, hata oranı artıyor. Zamanlama her şey!"
+                },
+                { 
+                    duration: 85, 
+                    speed: 280, 
+                    faultyChance: 0.55, 
+                    spawnRate: 640, 
+                    distractions: { randomStop: true, stopChance: 0.05, shake: true, shakeFrequency: 3000 },
+                    name: "Mükemmeliyetçilik",
+                    description: "Mükemmel performans gerektiren seviye. Hiç hata yok!"
+                },
+                { 
+                    duration: 90, 
+                    speed: 300, 
+                    faultyChance: 0.60, 
+                    spawnRate: 620, 
+                    distractions: { randomStop: true, stopChance: 0.06, bandFlicker: true, shake: true, shakeFrequency: 2500 },
+                    name: "Efsanevi Meydan Okuma",
+                    description: "Tüm yeteneklerini kullanacağın nihai test!"
+                }
+            ];
+
+            function resizeCanvas() {
+                const maxWidth = Math.min(window.innerWidth * 0.9, 1000);
+                const maxHeight = Math.min(window.innerHeight * 0.8, 600);
+                
+                // Mobil cihazlarda daha yüksek bir en-boy oranı kullan
+                const aspectRatio = window.innerWidth < 768 ? 1.5 : 1.67;
+                
+                let width = maxWidth;
+                let height = width / aspectRatio;
+                
+                if (height > maxHeight) {
+                    height = maxHeight;
+                    width = height * aspectRatio;
+                }
+                
+                canvas.width = width;
+                canvas.height = height;
+                gameContainer.style.width = `${width}px`;
+                gameContainer.style.height = `${height}px`;
+                
+                // Mobil kontrol butonlarını konumlandır
+                if (window.innerWidth < 768) {
+                    const mobileControls = document.querySelector('.mobile-controls');
+                    mobileControls.style.bottom = `${height * 0.15}px`;
+                }
+                
+                draw(); // Yeniden boyutlandığında sahneyi tekrar çiz
+            }
+
+            function init() {
+                resizeCanvas();
+                window.addEventListener('resize', resizeCanvas);
+                
+                // Ses sistemini başlat
+                SoundManager.init();
+                
+                // Başarımları yükle
+                AchievementSystem.unlocked = unlockedAchievements;
+                
+                startButton.addEventListener('click', () => {
+                    SoundManager.play('click');
+                    startScreen.classList.add('hidden');
+                    startGame();
+                });
+                
+                restartButton.addEventListener('click', () => {
+                    SoundManager.play('click');
+                    gameoverScreen.classList.add('hidden');
+                    score = 0;
+                    currentLevel = 0;
+                    powerups = { slowmo: 1, xray: 1 };
+                    stats = {
+                        correct: 0,
+                        incorrect: 0,
+                        total: 0,
+                        levelStart: 0,
+                        levelMistakes: 0,
+                        levelTime: 0
+                    };
+                    startGame();
+                });
+
+                canvas.addEventListener('click', handleCanvasClick);
+                canvas.addEventListener('touchstart', handleCanvasTouch);
+                slowmoBtn.addEventListener('click', activateSlowmo);
+                xrayBtn.addEventListener('click', activateXray);
+                soundToggle.addEventListener('click', () => {
+                    SoundManager.toggle();
+                    SoundManager.play('click');
+                });
+                
+                // Mobil kontroller
+                mobileLeftBtn.addEventListener('touchstart', (e) => {
+                    e.preventDefault();
+                    mobileControlActive = true;
+                    mobileControlDirection = -1;
+                });
+                
+                mobileLeftBtn.addEventListener('touchend', (e) => {
+                    e.preventDefault();
+                    mobileControlActive = false;
+                });
+                
+                mobileRightBtn.addEventListener('touchstart', (e) => {
+                    e.preventDefault();
+                    mobileControlActive = true;
+                    mobileControlDirection = 1;
+                });
+                
+                mobileRightBtn.addEventListener('touchend', (e) => {
+                    e.preventDefault();
+                    mobileControlActive = false;
+                });
+            }
+
+            function startGame() {
+                bottles = [];
+                combo = 0;
+                // Önceki titreşim interval'lerini temizle
+                shakeIntervals.forEach(id => clearInterval(id));
+                shakeIntervals = [];
+                // Görsel efektleri sıfırla
+                gameContainer.classList.remove('shake', 'xray-active', 'flicker');
+                gameState = 'transition';
+                showLevelTransition();
+            }
+            
+            function startLevel() {
+                const config = levelConfig[currentLevel];
+                timeLeft = config.duration;
+                spawnTimer = 0;
+                gameState = 'playing';
+                lastTime = performance.now();
+                
+                // Seviye istatistiklerini sıfırla
+                stats.levelStart = performance.now();
+                stats.levelMistakes = 0;
+                
+                // Titreme efektini başlat
+                if (config.distractions.shake) {
+                    const intervalId = setInterval(() => {
+                        if (gameState === 'playing') {
+                            gameContainer.classList.add('shake');
+                            setTimeout(() => gameContainer.classList.remove('shake'), 500);
+                        }
+                    }, config.distractions.shakeFrequency);
+                    shakeIntervals.push(intervalId);
+                }
+                
+                requestAnimationFrame(gameLoop);
+            }
+
+            function showLevelTransition() {
+                const config = levelConfig[currentLevel];
+                document.getElementById('transition-level-title').innerText = `Bölüm ${currentLevel + 1}: ${config.name}`;
+                
+                let message = config.description;
+                if(config.distractions.shake) message += "\nBantta titremeler olabilir!";
+                if(config.distractions.randomStop) message += "\nBantta ani duraksamalar yaşanabilir!";
+                if(config.distractions.bandFlicker) message += "\nBant ışığı anlık parlayabilir!";
+                
+                document.getElementById('transition-level-message').innerText = message;
+                
+                // Önceki seviye istatistiklerini göster
+                if (currentLevel > 0) {
+                    const levelTime = ((performance.now() - stats.levelStart) / 1000).toFixed(1);
+                    const accuracy = stats.total > 0 ? (stats.correct / stats.total * 100).toFixed(1) : 0;
+                    
+                    levelStatsDisplay.innerHTML = `
+                        <p>Önceki Seviye İstatistikleri:</p>
+                        <p>Doğru: ${stats.correct} | Yanlış: ${stats.incorrect} | Doğruluk: %${accuracy}</p>
+                        <p>Seviye Süresi: ${levelTime} saniye</p>
+                    `;
+                } else {
+                    levelStatsDisplay.innerHTML = '';
+                }
+                
+                levelTransitionScreen.classList.remove('hidden');
+
+                setTimeout(() => {
+                    levelTransitionScreen.classList.add('hidden');
+                    startLevel();
+                }, 4000); // 4 saniye sonra seviyeyi başlat
+            }
+
+            function gameLoop(timestamp) {
+                if (gameState !== 'playing') return;
+
+                const deltaTime = (timestamp - lastTime) / 1000; // Saniye cinsinden
+                lastTime = timestamp;
+
+                update(deltaTime);
+                draw();
+                updateUI();
+                
+                if(timeLeft <= 0) {
+                    endLevel();
+                } else {
+                    requestAnimationFrame(gameLoop);
+                }
+            }
+
+            function update(deltaTime) {
+                // Zamanlayıcı
+                timeLeft -= deltaTime;
+
+                // Şişe üretimi
+                spawnTimer += deltaTime * 1000;
+                const config = levelConfig[currentLevel];
+
+                // Band flaş efektleri (flicker)
+                if (config.distractions.bandFlicker && Math.random() < 0.02) {
+                    gameContainer.classList.add('flicker');
+                    // Animasyon bitişinde sınıfı kaldır
+                    setTimeout(() => gameContainer.classList.remove('flicker'), 400);
+                }
+                if (spawnTimer > config.spawnRate) {
+                    spawnTimer = 0;
+                    spawnBottle();
+                }
+
+                // Şişeleri güncelle
+                let effectiveSpeed = config.speed;
+                if(activePowerups.slowmo) effectiveSpeed *= 0.4;
+                if(config.distractions.randomStop && Math.random() < (config.distractions.stopChance / 60)) { // ~60 FPS
+                   effectiveSpeed = 0;
+                }
+
+                bottles.forEach(bottle => {
+                    bottle.x += effectiveSpeed * deltaTime;
+                });
+
+                // Ekran dışına çıkanları kontrol et
+                const initialBottleCount = bottles.length;
+                bottles = bottles.filter(bottle => {
+                    if (bottle.x > canvas.width + 50) {
+                        if (bottle.isFaulty) {
+                            updateScore(-5, bottle.x - 50, bottle.y);
+                            resetCombo();
+                            stats.incorrect++;
+                            stats.total++;
+                            stats.levelMistakes++;
+                        }
+                        return false;
+                    }
+                    return true;
+                });
+                
+                // Başarımları kontrol et
+                AchievementSystem.check();
+            }
+
+            function draw() {
+                ctx.clearRect(0, 0, canvas.width, canvas.height);
+                
+                // Konveyör bandı
+                ctx.fillStyle = '#34495e';
+                const beltY = canvas.height * 0.7;
+                const beltHeight = canvas.height * 0.2;
+                ctx.fillRect(0, beltY, canvas.width, beltHeight);
+                
+                // Bant detayları
+                ctx.fillStyle = '#566573';
+                ctx.fillRect(0, beltY, canvas.width, 10);
+                ctx.fillRect(0, beltY + beltHeight - 10, canvas.width, 10);
+                
+                // Hareketli bant çizgileri
+                const now = performance.now();
+                const offset = (now / 20) % 40;
+                ctx.strokeStyle = 'rgba(149, 165, 166, 0.3)';
+                ctx.lineWidth = 2;
+                ctx.beginPath();
+                for (let x = -40 + offset; x < canvas.width; x += 40) {
+                    ctx.moveTo(x, beltY + 15);
+                    ctx.lineTo(x + 20, beltY + beltHeight - 15);
+                }
+                ctx.stroke();
+
+                // Şişeleri çiz
+                bottles.forEach(bottle => drawBottle(bottle));
+            }
+
+            function drawBottle(bottle) {
+                const bottleWidth = 40;
+                const bottleHeight = 100;
+                const neckHeight = 30;
+                const neckWidth = 20;
+
+                ctx.save();
+                ctx.translate(bottle.x, bottle.y);
+
+                const bodyHeight = bottleHeight - neckHeight;
+                // Gövde için yatay gradyan oluşturalım (3B etki)
+                const gradBody = ctx.createLinearGradient(-bottleWidth / 2, 0, bottleWidth / 2, 0);
+                gradBody.addColorStop(0, shadeColor(bottle.color, -30));
+                gradBody.addColorStop(0.5, bottle.color);
+                gradBody.addColorStop(1, shadeColor(bottle.color, 30));
+                ctx.fillStyle = gradBody;
+                ctx.fillRect(-bottleWidth / 2, -bottleHeight, bottleWidth, bodyHeight);
+
+                // Gövde üst elipsi
+                ctx.beginPath();
+                ctx.ellipse(0, -bottleHeight, bottleWidth / 2, 5, 0, 0, Math.PI * 2);
+                ctx.fillStyle = shadeColor(bottle.color, 30);
+                ctx.fill();
+
+                // Gövde alt elipsi
+                ctx.beginPath();
+                ctx.ellipse(0, -neckHeight, bottleWidth / 2, 5, 0, 0, Math.PI * 2);
+                ctx.fillStyle = shadeColor(bottle.color, -20);
+                ctx.fill();
+
+                // Gövde parlaması
+                ctx.fillStyle = 'rgba(255,255,255,0.2)';
+                ctx.fillRect(-bottleWidth / 2 + 5, -bottleHeight + 10, 3, bodyHeight - 20);
+
+                // Şişe Boynu için gradyan
+                const gradNeck = ctx.createLinearGradient(-neckWidth / 2, 0, neckWidth / 2, 0);
+                gradNeck.addColorStop(0, shadeColor(bottle.color, -30));
+                gradNeck.addColorStop(0.5, bottle.color);
+                gradNeck.addColorStop(1, shadeColor(bottle.color, 30));
+                ctx.fillStyle = gradNeck;
+                ctx.fillRect(-neckWidth / 2, -neckHeight, neckWidth, neckHeight);
+
+                // Boyun parlaması
+                ctx.fillStyle = 'rgba(255,255,255,0.2)';
+                ctx.fillRect(-neckWidth / 2 + 2, -neckHeight + 3, 2, neckHeight - 6);
+
+                // Kapağı çiz
+                ctx.fillStyle = '#e74c3c';
+                ctx.fillRect(-neckWidth / 2 - 2, -neckHeight - 5, neckWidth + 4, 5);
+                
+                // Kapağın üstü
+                ctx.beginPath();
+                ctx.ellipse(0, -neckHeight - 5, neckWidth / 2 + 2, 3, 0, 0, Math.PI * 2);
+                ctx.fill();
+
+                // Hata Çizimi
+                if (bottle.isFaulty) {
+                    // X-Ray aktifse hatayı vurgula
+                    if (activePowerups.xray) {
+                        ctx.strokeStyle = '#00ff00';
+                        ctx.lineWidth = 4;
+                        ctx.strokeRect(-bottleWidth / 2 - 5, -bottleHeight - 5, bottleWidth + 10, bottleHeight + 10);
+                        
+                        // X-Ray ışık efekti
+                        ctx.shadowColor = '#00ff00';
+                        ctx.shadowBlur = 15;
+                        ctx.strokeRect(-bottleWidth / 2 - 5, -bottleHeight - 5, bottleWidth + 10, bottleHeight + 10);
+                        ctx.shadowBlur = 0;
+                    }
+
+                    ctx.fillStyle = bottle.faultColor;
+                    switch (bottle.faultType) {
+                        case 'color':
+                            // Renk hatalı olduğundan gövde rengi zaten ayarlanmış
+                            break;
+                        case 'crack':
+                            ctx.beginPath();
+                            ctx.moveTo(0, -50);
+                            ctx.lineTo(10, -60);
+                            ctx.lineTo(5, -70);
+                            ctx.lineTo(15, -80);
+                            ctx.strokeStyle = '#000';
+                            ctx.lineWidth = 1.5;
+                            ctx.stroke();
+                            break;
+                        case 'label':
+                            ctx.fillRect(-15, -60, 30, 10);
+                            // Etiket üzerinde yazı
+                            ctx.fillStyle = '#fff';
+                            ctx.font = '8px Arial';
+                            ctx.fillText('HATALI', -12, -53);
+                            break;
+                        case 'cap':
+                            // Kapağın rengini değiştir
+                            ctx.fillStyle = '#f39c12';
+                            ctx.fillRect(-neckWidth / 2 - 2, -neckHeight - 5, neckWidth + 4, 5);
+                            ctx.beginPath();
+                            ctx.ellipse(0, -neckHeight - 5, neckWidth / 2 + 2, 3, 0, 0, Math.PI * 2);
+                            ctx.fill();
+                            break;
+                    }
+                }
+
+                ctx.restore();
+            }
+
+            function spawnBottle() {
+                const config = levelConfig[currentLevel];
+                const isFaulty = Math.random() < config.faultyChance;
+                let faultType = null;
+                let color = '#76c7c0'; // Normal renk
+                let faultColor = 'red';
+                
+                if (isFaulty) {
+                    const faultRoll = Math.random();
+                    if(faultRoll < 0.4) {
+                        faultType = 'color';
+                        color = '#b33939'; // Hatalı renk
+                    } else if (faultRoll < 0.7) {
+                        faultType = 'crack';
+                    } else if (faultRoll < 0.9) {
+                        faultType = 'label'; // Yanlış etiket
+                        faultColor = 'yellow';
+                    } else {
+                        faultType = 'cap'; // Yanlış kapak
+                        faultColor = 'orange';
+                    }
+                }
+
+                bottles.push({
+                    x: -50,
+                    y: canvas.height * 0.7,
+                    isFaulty: isFaulty,
+                    faultType: faultType,
+                    color: color,
+                    faultColor: faultColor
+                });
+            }
+            
+            function handleCanvasClick(event) {
+                if (gameState !== 'playing') return;
+
+                const rect = canvas.getBoundingClientRect();
+                const clickX = event.clientX - rect.left;
+                const clickY = event.clientY - rect.top;
+
+                checkBottleClick(clickX, clickY);
+            }
+            
+            function handleCanvasTouch(event) {
+                if (gameState !== 'playing') return;
+                
+                event.preventDefault();
+                const rect = canvas.getBoundingClientRect();
+                const touch = event.touches[0];
+                const clickX = touch.clientX - rect.left;
+                const clickY = touch.clientY - rect.top;
+                
+                checkBottleClick(clickX, clickY);
+            }
+            
+            function checkBottleClick(clickX, clickY) {
+                let bottleClicked = false;
+                for (let i = bottles.length - 1; i >= 0; i--) {
+                    const bottle = bottles[i];
+                    const bottleLeft = bottle.x - 20;
+                    const bottleRight = bottle.x + 20;
+                    const bottleTop = bottle.y - 100;
+                    const bottleBottom = bottle.y;
+
+                    if (clickX > bottleLeft && clickX < bottleRight && clickY > bottleTop && clickY < bottleBottom) {
+                        if (bottle.isFaulty) {
+                            updateScore(10, clickX, clickY);
+                            bottles.splice(i, 1);
+                            combo++;
+                            stats.correct++;
+                            stats.total++;
+                            checkCombo();
+                            SoundManager.play('correct');
+                            
+                            // Partikül efekti
+                            particleSystem.create(clickX, clickY, '#2ecc71', 15);
+                        } else {
+                            updateScore(-3, clickX, clickY);
+                            resetCombo();
+                            stats.incorrect++;
+                            stats.total++;
+                            stats.levelMistakes++;
+                            SoundManager.play('wrong');
+                            
+                            // Partikül efekti
+                            particleSystem.create(clickX, clickY, '#e74c3c', 10);
+                        }
+                        bottleClicked = true;
+                        break; 
+                    }
+                }
+            }
+
+            function updateScore(amount, x, y) {
+                score += amount;
+                score = Math.max(0, score); // Skorun negatif olmasını engelle
+                
+                const text = document.createElement('div');
+                text.className = 'floating-text';
+                text.textContent = (amount > 0 ? '+' : '') + amount;
+                text.style.left = `${x}px`;
+                text.style.top = `${y}px`;
+                text.style.color = amount > 0 ? '#2ecc71' : '#e74c3c';
+                gameContainer.appendChild(text);
+
+                setTimeout(() => {
+                    text.remove();
+                }, 1000);
+            }
+
+            function resetCombo() {
+                combo = 0;
+                comboDisplay.textContent = '';
+            }
+
+            function checkCombo() {
+                if (combo > 0 && combo % 5 === 0) {
+                    updateScore(combo * 2, canvas.width / 2, canvas.height / 2);
+                    comboDisplay.textContent = `${combo}x COMBO!`;
+                    SoundManager.play('combo');
+                    
+                    // Combo partikül efekti
+                    particleSystem.create(canvas.width / 2, canvas.height / 2, '#f1c40f', 25);
+                    
+                    setTimeout(() => comboDisplay.textContent = '', 2000);
+                }
+            }
+            
+            function activateSlowmo() {
+                if (powerups.slowmo > 0 && !activePowerups.slowmo) {
+                    powerups.slowmo--;
+                    activePowerups.slowmo = setTimeout(() => {
+                        activePowerups.slowmo = null;
+                        updateUI();
+                    }, 5000); // 5 saniye
+                    updateUI();
+                    SoundManager.play('powerup');
+                    
+                    // Partikül efekti
+                    const rect = slowmoBtn.getBoundingClientRect();
+                    const containerRect = gameContainer.getBoundingClientRect();
+                    particleSystem.create(
+                        rect.left - containerRect.left + rect.width / 2,
+                        rect.top - containerRect.top + rect.height / 2,
+                        '#3498db',
+                        20
+                    );
+                }
+            }
+
+            function activateXray() {
+                if (powerups.xray > 0 && !activePowerups.xray) {
+                    powerups.xray--;
+                    gameContainer.classList.add('xray-active');
+                    activePowerups.xray = setTimeout(() => {
+                        activePowerups.xray = null;
+                        gameContainer.classList.remove('xray-active');
+                        updateUI();
+                    }, 3000); // 3 saniye
+                    updateUI();
+                    SoundManager.play('powerup');
+                    
+                    // Partikül efekti
+                    const rect = xrayBtn.getBoundingClientRect();
+                    const containerRect = gameContainer.getBoundingClientRect();
+                    particleSystem.create(
+                        rect.left - containerRect.left + rect.width / 2,
+                        rect.top - containerRect.top + rect.height / 2,
+                        '#2ecc71',
+                        20
+                    );
+                }
+            }
+
+            function updateUI() {
+                scoreDisplay.querySelector('span').textContent = `Puan: ${score}`;
+                timerDisplay.querySelector('span').textContent = `Süre: ${Math.ceil(Math.max(0, timeLeft))}`;
+                levelDisplay.querySelector('span').textContent = `Bölüm: ${currentLevel + 1}`;
+                
+                // İstatistikleri güncelle
+                correctCountDisplay.textContent = stats.correct;
+                incorrectCountDisplay.textContent = stats.incorrect;
+                const accuracy = stats.total > 0 ? (stats.correct / stats.total * 100).toFixed(1) : 0;
+                accuracyRateDisplay.textContent = `${accuracy}%`;
+
+                slowmoBtn.querySelector('span').textContent = `Yavaşlat (${powerups.slowmo})`;
+                slowmoBtn.disabled = powerups.slowmo <= 0 || !!activePowerups.slowmo;
+
+                xrayBtn.querySelector('span').textContent = `X-Ray (${powerups.xray})`;
+                xrayBtn.disabled = powerups.xray <= 0 || !!activePowerups.xray;
+
+                // Zaman çubuğunu güncelle
+                const levelDuration = levelConfig[currentLevel] ? levelConfig[currentLevel].duration : 1;
+                const percent = (timeLeft / levelDuration) * 100;
+                timeBarFill.style.width = `${Math.max(0, Math.min(100, percent))}%`;
+                
+                // Zaman çubuğunun rengini değiştir (kritik seviyede kırmızıya döner)
+                if (percent < 20) {
+                    timeBarFill.style.background = 'linear-gradient(90deg, #e74c3c, #c0392b)';
+                } else if (percent < 50) {
+                    timeBarFill.style.background = 'linear-gradient(90deg, #f39c12, #e67e22)';
+                } else {
+                    timeBarFill.style.background = 'linear-gradient(90deg, #2ecc71, #27ae60)';
+                }
+
+                // Zaman çubuğunu yalnızca oyun oynanırken görünür yap
+                if (gameState === 'playing') {
+                    timeBarContainer.style.opacity = '1';
+                } else {
+                    timeBarContainer.style.opacity = '0';
+                }
+            }
+            
+            function endLevel() {
+                currentLevel++;
+                
+                // Hızlı bitirme başarımı kontrolü
+                const levelTime = (performance.now() - stats.levelStart) / 1000;
+                const config = levelConfig[currentLevel - 1];
+                if (levelTime < config.duration * 0.7) {
+                    // Hızlı bitirme başarımı
+                    const achievement = AchievementSystem.achievements.find(a => a.id === 'speed_demon');
+                    if (achievement && !AchievementSystem.unlocked.includes(achievement.id)) {
+                        AchievementSystem.unlock(achievement);
+                    }
+                }
+                
+                if(currentLevel >= levelConfig.length) {
+                    endGame(true); // Kazandı
+                } else {
+                    // Seviye geçişi bonusları
+                    powerups.slowmo++;
+                    powerups.xray++;
+                    SoundManager.play('levelup');
+                    startGame(); // Sonraki seviyeyi başlat
+                }
+            }
+
+            function endGame(isWin) {
+                gameState = 'gameover';
+                // Tüm interval'leri ve efektleri temizle
+                shakeIntervals.forEach(id => clearInterval(id));
+                shakeIntervals = [];
+                gameContainer.classList.remove('shake', 'xray-active', 'flicker');
+                finalScoreDisplay.textContent = `Toplam Puan: ${score}`;
+
+                // Yüksek skoru güncelle
+                if (score > highScore) {
+                    highScore = score;
+                    localStorage.setItem('qualityHighScore', highScore.toString());
+                }
+                // Yüksek skor bilgisini göster
+                if (highScoreDisplay) {
+                    highScoreDisplay.textContent = `En Yüksek Puan: ${highScore}`;
+                }
+
+                // Final istatistiklerini göster
+                const accuracy = stats.total > 0 ? (stats.correct / stats.total * 100).toFixed(1) : 0;
+                finalStatsDisplay.innerHTML = `
+                    <p><strong>İstatistikler:</strong></p>
+                    <p>Doğru: ${stats.correct} | Yanlış: ${stats.incorrect} | Doğruluk: %${accuracy}</p>
+                    <p>Tamamlanan Seviye: ${currentLevel} / ${levelConfig.length}</p>
+                `;
+
+                if (isWin) {
+                    gameResultMessage.textContent = "Tebrikler! Tüm bölümleri başarıyla tamamladın. Gerçek bir kalite kontrol uzmanısın!";
+                    SoundManager.play('levelup');
+                } else {
+                     gameResultMessage.textContent = "Daha dikkatli olmalısın. Tekrar denemek ister misin?";
+                }
+
+                // Başarımları kaydet
+                localStorage.setItem('unlockedAchievements', JSON.stringify(AchievementSystem.unlocked));
+                
+                gameoverScreen.classList.remove('hidden');
+            }
+
+            // Oyunu başlat
+            init();
+        });
+    </script>
+</body>
+</html>

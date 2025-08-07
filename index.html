@@ -1,0 +1,199 @@
+<!DOCTYPE html>
+<html lang="tr">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <title>Kalite Kontrol Simülatörü Pro v2.0</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Orbitron:wght@400;500;600;700&family=Roboto:wght@300;400;500;700&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <link rel="stylesheet" href="css/style.css">
+</head>
+<body>
+    <!-- YÜKLEME EKRANI -->
+    <div id="loader" class="loader-container">
+        <div class="loader"></div>
+        <div class="loader-text">YÜKLENİYOR...</div>
+    </div>
+
+    <!-- ARKA PLAN ANİMASYONU -->
+    <div class="bg-animation">
+        <span></span>
+        <span></span>
+        <span></span>
+        <span></span>
+        <span></span>
+        <span></span>
+        <span></span>
+        <span></span>
+        <span></span>
+        <span></span>
+    </div>
+
+    <div id="game-container">
+        <!-- Video Arka Plan -->
+        <video id="background-video" autoplay muted loop playsinline>
+            <source src="assets/images/social_tordah_wide_angle_view_of_a_modern_clean_and_brightly_lit_bev_45b0282b-9417-4130-a4b1-a868fb43cada_2.mp4" type="video/mp4">
+        </video>
+        
+        <canvas id="game-canvas"></canvas>
+        
+        <!-- Arayüz Elemanları -->
+        <div id="version-label">QC Officer Pro v2.1.0 • 2025-08-07</div>
+        <div id="score-display" class="ui-element">
+            <i class="fas fa-star"></i>
+            <span>Puan: 0</span>
+        </div>
+        <div id="timer-display" class="ui-element">
+            <i class="fas fa-clock"></i>
+            <span>Süre: 60</span>
+        </div>
+        <div id="level-display" class="ui-element">
+            <i class="fas fa-layer-group"></i>
+            <span>Bölüm: 1</span>
+        </div>
+        <div id="combo-display" class="ui-element"></div>
+
+        <!-- Ses Kontrolü -->
+        <div id="sound-control">
+            <button class="sound-btn" id="sound-toggle">
+                <i class="fas fa-volume-up"></i>
+            </button>
+            <button class="sound-btn" id="pause-toggle" title="Pause/Settings">
+                <i class="fas fa-pause"></i>
+            </button>
+        </div>
+
+        <!-- Oyun İstatistikleri -->
+        <div id="stats-container">
+            <div class="stat-item">
+                <span class="stat-label">Doğru:</span>
+                <span class="stat-value" id="correct-count">0</span>
+            </div>
+            <div class="stat-item">
+                <span class="stat-label">Yanlış:</span>
+                <span class="stat-value" id="incorrect-count">0</span>
+            </div>
+            <div class="stat-item">
+                <span class="stat-label">Doğruluk:</span>
+                <span class="stat-value" id="accuracy-rate">0%</span>
+            </div>
+        </div>
+
+        <!-- Pause / Settings Panel -->
+        <div id="settings-panel" class="overlay-panel">
+            <h3>Settings</h3>
+            <div class="form-row">
+                <label>Master Volume</label>
+                <input id="volume-master" type="range" min="0" max="1" step="0.01" />
+            </div>
+            <div class="form-row">
+                <label>Effects Volume</label>
+                <input id="volume-effects" type="range" min="0" max="1" step="0.01" />
+            </div>
+            <div class="form-row">
+                <label>Video Background</label>
+                <input id="video-bg-toggle" type="checkbox" />
+            </div>
+            <div class="form-row">
+                <label>Graphics Quality</label>
+                <select id="graphics-quality">
+                    <option value="low">Low</option>
+                    <option value="high" selected>High</option>
+                </select>
+            </div>
+            <div class="form-row">
+                <label>Color Filter</label>
+                <select id="color-filter">
+                    <option value="none">None</option>
+                    <option value="mono">Monochrome</option>
+                    <option value="deut">Deuteranopia</option>
+                    <option value="prot">Protanopia</option>
+                </select>
+            </div>
+            <div class="form-row" style="justify-content:flex-end; gap:8px;">
+                <button id="settings-close" class="sound-btn">Close</button>
+            </div>
+        </div>
+
+        <!-- Zaman Çubuğu -->
+        <div id="time-bar-container">
+            <div id="time-bar-fill"></div>
+        </div>
+        
+        <!-- Güçlendirmeler -->
+        <div id="powerup-container">
+            <button id="slowmo-btn" class="powerup-btn">
+                <i class="fas fa-tachometer-alt"></i>
+                <span>Yavaşlat (1)</span>
+            </button>
+            <!-- Kontrol ışığı artık sürekli aktif olduğu için buton kaldırıldı -->
+        </div>
+
+        <!-- Mobil Kontroller -->
+        <div class="mobile-controls">
+            <button class="mobile-btn" id="mobile-left">
+                <i class="fas fa-chevron-left"></i>
+            </button>
+            <button class="mobile-btn" id="mobile-right">
+                <i class="fas fa-chevron-right"></i>
+            </button>
+        </div>
+
+        <!-- Intro Ekranı -->
+        <div id="intro-screen" class="screen-overlay">
+            <div class="intro-logo" data-lang="gameTitle">KALİTE<br>KONTROL</div>
+            <div class="intro-subtitle" data-lang="gameSubtitle">Pro Simülatör v2.0</div>
+            
+            <!-- Dil Seçici -->
+            <div class="language-selector">
+                <button id="lang-tr" class="lang-btn active">🇹🇷 TR</button>
+                <button id="lang-en" class="lang-btn">🇬🇧 EN</button>
+            </div>
+            
+            <div class="intro-loader">
+                <div class="intro-loader-bar"></div>
+            </div>
+            <div class="intro-tip" data-lang="introTip">🔍 İpucu: Kontrol ışığını kullanarak gizli hataları tespit edin!</div>
+        </div>
+
+        <!-- Başlangıç Ekranı -->
+        <div id="start-screen" class="screen-overlay hidden">
+            <h1 data-lang="gameTitle">Kalite Kontrol Pro</h1>
+            <p data-lang="gameDescription">Şirketimizin üretim bandından geçen ürünleri kontrol etmelisin. Hatalı şişeleri tespit edip banttan ayıklamalısın. Doğru tespitler puan kazandırır, hatalar ise puan kaybettirir.</p>
+            <p data-lang="gameFeatures"><strong>YENİ:</strong> Kontrol ışığı sistemi ile artık mikroskobik hataları da tespit edebilirsin! Bazı hatalar sadece özel ışık altında görünür.</p>
+            <p data-lang="gameStory"><strong>Hikaye:</strong> Global İçecek A.Ş.'de yeni başlayan bir kalite kontrol uzmanısın. 40 bölümlük epik bir serüvende fabrikayı sabotajdan koruman gerekiyor!</p>
+            <button id="start-button" data-lang="startGame">MACERAYA BAŞLA</button>
+        </div>
+
+        <!-- Oyun Bitti Ekranı -->
+        <div id="gameover-screen" class="screen-overlay hidden">
+            <h1>Oyun Bitti!</h1>
+            <p id="final-score"></p>
+            <p id="game-result-message"></p>
+            <p id="high-score-display"></p>
+            <div id="final-stats"></div>
+            <button id="restart-button">YENİDEN BAŞLA</button>
+        </div>
+        
+         <!-- Seviye Geçiş Ekranı -->
+        <div id="level-transition-screen" class="screen-overlay hidden">
+            <h1 id="transition-level-title"></h1>
+            <p id="transition-level-message"></p>
+            <div id="level-stats"></div>
+        </div>
+    </div>
+
+    <!-- JavaScript Modülleri - Doğru Sıralama -->
+    <script src="js/language.js"></script>
+    <script src="js/settings.js"></script>
+    <script src="js/modes.js"></script>
+    <script src="js/perks.js"></script>
+    <script src="js/challenges.js"></script>
+    <script src="js/config.js"></script>
+    <script src="js/ui.js"></script>
+    <script src="js/game.js"></script>
+    <script src="js/main.js"></script>
+</body>
+</html>

@@ -1,0 +1,193 @@
+KALITE KONTROL SIMÜLATÖRÜ PRO - PROJE YAPISI
+Sürüm: v2.0.0
+Tarih: ${new Date().toLocaleDateString('tr-TR')}
+
+================================================================
+DOSYA YAPISININ DETAYLI AÇIKLAMASI
+================================================================
+
+/Kalite Kontrol Oyunu
+│
+├── index.html                    // Ana HTML dosyası (sadece iskelet)
+├── Structure_v2.txt              // Bu dosya - proje yapısı
+├── HATA ÇÖZÜMLERİ.txt           // Hata kayıtları ve çözümler
+├── HikayeYapisi.MD              // 40 bölümlük hikaye planı
+│
+├── /css
+│   └── style.css                // Tüm CSS stilleri (modüler ve düzenli)
+│
+├── /js
+│   ├── config.js               // Oyun ayarları, seviye konfigürasyonu
+│   ├── ui.js                   // Arayüz yönetimi, ses, partiküller
+│   ├── game.js                 // Ana oyun motoru ve sınıflar
+│   └── main.js                 // Uygulama başlatıcı ve koordinatör
+│
+└── /assets
+    ├── /images
+    │   └── README.md           // Görsel varlık planlaması
+    ├── /sounds                 // Ses efektleri (ileride)
+    └── /animations             // Hikaye animasyonları (ileride)
+
+================================================================
+MODÜLER YAPI AÇIKLAMASI
+================================================================
+
+1. CONFIG.JS - YAPILANDIRMA KATMANI
+   ■ GameConfig: Genel oyun ayarları
+   ■ LevelConfig: 20 seviye + sonsuz mod
+   ■ Hata türleri: Görünür ve gizli hatalar
+   ■ Başarım sistemi: 18 farklı başarım
+   ■ Kontrol ışığı ayarları
+   ■ Hikaye karakterleri ve diyaloglar
+
+2. UI.JS - ARAYÜZ KATMANI
+   ■ UIManager: Tüm DOM elemanlarını yönetir
+   ■ SoundManager: Web Audio API ile ses sistemi
+   ■ ParticleSystem: Canvas tabanlı partikül efektleri
+   ■ AchievementSystem: Başarım kilitleme/açma
+   ■ StorySystem: Hikaye diyalogları ve karakterler
+
+3. GAME.JS - OYUN MOTORU KATMANI
+   ■ Game: Ana oyun sınıfı, koordinasyon merkezi
+   ■ Bottle: Şişe nesnesi (rendering, çarpışma, hatalar)
+   ■ ConveyorBelt: Konveyör bandı animasyonu
+   ■ ControlLight: Yeni ışık mekaniği sistemi
+
+4. MAIN.JS - BAŞLATMA KATMANI
+   ■ AppLoader: Uygulama yükleyici ve hata yönetimi
+   ■ DevTools: Geliştirici araçları (localhost)
+   ■ Performans izleme
+   ■ Global hata yakalayıcı
+
+================================================================
+YENİ ÖZELLİKLER (v2.0.0)
+================================================================
+
+✅ KONTROL IŞIĞI MEKANİĞİ
+   - Bandın belirli bölgesinde aktif
+   - Gizli hataları görünür kılar
+   - Stratejik kullanım gerektirir
+   - Mikro çatlak, yabancı cisim, dolum hatası tespiti
+
+✅ GENİŞLETİLMİŞ HATA TÜRLERİ
+   - Görünür: Renk, kapak hataları
+   - Gizli: Mikro çatlak, yabancı cisim, dolum, etiket hizalama
+   - Hata türüne göre bonus puanlama
+
+✅ HİKAYE SİSTEMİ
+   - 4 karakter: Mehmet Abi, Mühendis Ayşe, Müdür, CEO
+   - Seviye arası diyaloglar
+   - Sabotaj teması ile 40 bölümlük hikaye
+
+✅ GELİŞMİŞ SEVİYE SİSTEMİ
+   - İlk 5 seviye: Temel öğretim
+   - 6-10: Kontrol ışığı tanıtımı
+   - 11-15: Karma hatalar
+   - 16-20: Usta seviyeleri
+   - Sonsuz mod: Otomatik zorluk artışı
+
+✅ BAŞARIM SİSTEMİ
+   - Combo başarımları (5x, 10x, 20x)
+   - Doğruluk oranı başarımları (%80, %90, %95)
+   - Özel mekanik başarımları (Işık Ustası, Mikro Çatlak Avcısı)
+
+================================================================
+TEKNİK GELİŞTİRMELER
+================================================================
+
+▶ KOD KALİTESİ
+   - Tek dosyadan 4 modüle ayrıldı
+   - Sınıf tabanlı mimari
+   - Separation of concerns prensibi
+   - Yeniden kullanılabilir bileşenler
+
+▶ PERFORMANS
+   - Canvas optimizasyonları
+   - Etkin partikül sistemi
+   - Memory leak önlemleri
+   - Mobil cihaz optimizasyonu
+
+▶ BAKIM KOLAYLIği
+   - Yapılandırma dosyası ile kolay seviye düzenleme
+   - Modüler CSS yapısı
+   - Geliştirici araçları
+   - Detaylı hata loglama
+
+▶ KULLANICI DENEYİMİ
+   - Responsive tasarım
+   - Mobil dokunma kontrolü
+   - Ses açma/kapama
+   - Otomatik kaydetme
+
+================================================================
+GELECEK PLANLAR (v3.0)
+================================================================
+
+🚧 DİNAMİK ARKA PLAN
+   - Paralaks efektli fabrika görünümü
+   - Hareketli makineler ve buhar efektleri
+   - Gerçekçi endüstriyel atmosfer
+
+🚧 İLERİ MEKANİKLER
+   - Farklı şişe türleri (cam, plastik, metal kutu)
+   - Çoklu bant sistemi
+   - İnsan faktörü zorlukları (yorgunluk, dikkat dağınıklığı)
+
+🚧 ÇOK OYUNCULU MOD
+   - Rekabet modu
+   - Takım çalışması
+   - Leaderboard sistemi
+
+🚧 VR/AR ENTEGRASYONU
+   - Sanal gerçeklik desteği
+   - Gerçek fabrika simülasyonu
+   - El hareket takibi
+
+================================================================
+DEPLOYMENT NOTLARI
+================================================================
+
+⚠️  TARAYICI UYUMLULUĞU
+   - Modern tarayıcılar (Chrome 80+, Firefox 75+, Safari 13+)
+   - Canvas 2D desteği gerekli
+   - Web Audio API desteği önerilen
+
+⚠️  DOSYA YAPISI
+   - Tüm dosyalar aynı domain'de olmalı
+   - CORS ayarları uygun olmalı
+   - index.html ana giriş noktası
+
+⚠️  PERFORMANS
+   - Minimum 2GB RAM önerilen
+   - 60 FPS için modern GPU
+   - Mobilde 30 FPS hedeflenir
+
+================================================================
+SÜRÜM GEÇMİŞİ
+================================================================
+
+v1.0.0 (Önceki)
+- Tek dosya yapısı
+- Temel oyun mekaniği
+- X-Ray güçlendirmesi
+- 20 seviye
+
+v2.0.0 (Mevcut)
+- Modüler mimari
+- Kontrol ışığı sistemi  
+- Hikaye entegrasyonu
+- Genişletilmiş hata türleri
+- Gelişmiş başarım sistemi
+- 40 bölümlük hikaye planı
+
+================================================================
+İLETİŞİM VE DESTEK
+================================================================
+
+Geliştirici: AI Assistant
+Proje Tipi: Eğitim/Simülasyon Oyunu
+Lisans: MIT (Önerilen)
+Platform: Web (HTML5/Canvas)
+
+Son Güncelleme: ${new Date().toLocaleDateString('tr-TR')}
+Durum: Aktif Geliştirme

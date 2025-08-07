@@ -1,0 +1,23 @@
+# OS / Editor
+.DS_Store
+Thumbs.db
+*.log
+
+# Node / tooling (ileride kullanılırsa)
+node_modules/
+
+# Python http.server cache
+__pycache__/
+
+# Env / secrets
+.env
+
+# Design source files
+*.psd
+*.ai
+*.xcf
+
+# Build artifacts (ileride eklenebilir)
+dist/
+build/
+

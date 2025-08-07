@@ -1,0 +1,40 @@
+{
+  "name": "quality-control-officer-game",
+  "version": "2.0.0",
+  "description": "A professional quality control simulation game built with HTML5 Canvas and vanilla JavaScript",
+  "main": "index.html",
+  "scripts": {
+    "start": "python -m http.server 8000",
+    "serve": "npx serve .",
+    "test": "echo \"No tests specified\" && exit 0"
+  },
+  "keywords": [
+    "game",
+    "quality-control",
+    "simulation",
+    "html5",
+    "canvas",
+    "javascript",
+    "factory",
+    "inspection",
+    "multilingual"
+  ],
+  "author": "QC Officer Game Team",
+  "license": "MIT",
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/tordaht/QC-Officer-Game.git"
+  },
+  "bugs": {
+    "url": "https://github.com/tordaht/QC-Officer-Game/issues"
+  },
+  "homepage": "https://github.com/tordaht/QC-Officer-Game#readme",
+  "engines": {
+    "node": ">=12.0.0"
+  },
+  "browserslist": [
+    "last 2 versions",
+    "> 1%",
+    "not dead"
+  ]
+}
