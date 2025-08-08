@@ -3,7 +3,8 @@ const ModeConfig = {
     Story: {
         id: 'story',
         name: 'Story',
-        timer: (level) => GameConfig.levels[level]?.duration || 60,
+        // LevelConfig GameConfig içinde değil, global LevelConfig kullan
+        timer: (level) => (typeof LevelConfig !== 'undefined' && LevelConfig[level]?.duration) || 60,
         endless: false,
         scoring: { controlZoneBonus: 1.2, earlyClickPenalty: 0.8 }
     },

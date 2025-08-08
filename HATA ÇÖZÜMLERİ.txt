@@ -171,3 +171,37 @@ KRİTİK HATALAR DÜZELTİLDİ (2024-12-19):
    - MIT License eklendi
    - package.json konfigürasyonu tamamlandı
    - Proje https://github.com/tordaht/QC-Officer-Game için hazır
+
+===============================================================
+YENİ KAYITLAR (2025-08-08):
+===============================================================
+
+10. SORUN: Mobilde başlangıç/intro ve start ekranı dar görünümde butonlar görünmüyor (scroll yok)
+   TARİH: 2025-08-08
+   ÇÖZÜM: `.screen-overlay` için `overflow-y:auto` ve padding eklendi; dil seçici butonları için responsive padding/font-size iyileştirildi.
+   DURUM: ✅ ÇÖZÜLDÜ
+
+11. SORUN: Dil seçimi sonrası diyaloglar TR/EN'e göre değişmiyor (TR metinler sabit)
+   TARİH: 2025-08-08
+   ÇÖZÜM: `UIManager.showLevelTransition` dil uyumlu olacak şekilde `LanguageManager.storyDialogues` ve `storyCharacters` üzerinden diyalogları çekiyor. EN metinleri sadeleştirilip eklendi.
+   DURUM: ✅ ÇÖZÜLDÜ
+
+12. SORUN: `modes.js` yanlış LevelConfig referansı (GameConfig.levels)
+   TARİH: 2025-08-08
+   ÇÖZÜM: `timer` fonksiyonu global `LevelConfig[level]` kullanacak şekilde düzeltildi.
+   DURUM: ✅ ÇÖZÜLDÜ
+
+13. SORUN: `game.js` seviye geçişinde olmayan `controlLight` powerup sayacı artırılıyor
+   TARİH: 2025-08-08
+   ÇÖZÜM: İlgili satır kaldırıldı (kontrol ışığı zaten sürekli aktif).
+   DURUM: ✅ ÇÖZÜLDÜ
+
+14. İYİLEŞTİRME: Günlük görevler/Challenges tetiklenmiyordu
+   TARİH: 2025-08-08
+   ÇÖZÜM: Kontrol alanından giriş `zone_10`, mikro çatlak tespitinde `find_3_micro`, 5x kombo `combo_5` ilerlemeleri eklendi.
+   DURUM: ✅ EKLENDİ
+
+15. İYİLEŞTİRME: Versiyon/seri no
+   TARİH: 2025-08-08
+   ÇÖZÜM: `BuildInfo (v2.1.1 / QC-2025-08-08-001)` eklendi, `index.html` versiyon etiketi dinamik dolduruluyor.
+   DURUM: ✅ EKLENDİ

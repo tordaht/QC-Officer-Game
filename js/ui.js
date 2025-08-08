@@ -10,6 +10,17 @@ class UIManager {
         this.storySystem = new StorySystem();
         this.setupLanguageSystem();
         this.setupSettingsPanel();
+
+        // Versiyon/seri no etiketi
+        try {
+            const label = document.getElementById('version-label');
+            if (label && window.BuildInfo) {
+                const v = window.BuildInfo.version || GameConfig.version;
+                const d = window.BuildInfo.date || '';
+                const s = window.BuildInfo.serial || '';
+                label.textContent = `QC Officer Pro v${v} • ${d} • ${s}`;
+            }
+        } catch {}
     }
 
     initializeElements() {
@@ -91,6 +102,11 @@ class UIManager {
 
         settingsBtn.addEventListener('click', () => {
             panel.classList.toggle('show');
+            // Oyun örneği üzerinden pause/resume
+            if (window.appLoader && window.appLoader.game) {
+                const g = window.appLoader.game;
+                if (panel.classList.contains('show')) g.pause(); else g.resume();
+            }
         });
         closeBtn && closeBtn.addEventListener('click', () => panel.classList.remove('show'));
 
@@ -139,6 +155,12 @@ class UIManager {
 
         // Buton metinlerini güncelle
         this.updateButtonTexts();
+
+        // Kontrol alanı yazısı (canvas üstü metin dil uyumu)
+        const gc = this.elements.gameContainer;
+        if (gc) {
+            gc.setAttribute('data-control-zone-label', window.LanguageManager.get('controlZone'));
+        }
     }
 
     updateButtonTexts() {
@@ -313,8 +335,26 @@ class UIManager {
         
         document.getElementById('transition-level-message').innerText = message;
         
-        if (config.supervisor && config.dialogue) {
-            this.storySystem.showDialogue(config.supervisor, config.dialogue);
+        // Dil uyumlu hikaye diyalogları (LanguageManager üzerinden)
+        try {
+            const dialogues = window.LanguageManager.get('storyDialogues');
+            const chars = window.LanguageManager.get('storyCharacters');
+            if (Array.isArray(dialogues)) {
+                const entry = dialogues.find(d => d.level === (level + 1));
+                if (entry) {
+                    const sup = (chars && chars[entry.character]) ? chars[entry.character] : (config.supervisor || '');
+                    this.storySystem.showDialogue(sup, entry.dialogue);
+                } else if (config.supervisor && config.dialogue) {
+                    // Fallback: LevelConfig içeriği
+                    this.storySystem.showDialogue(config.supervisor, config.dialogue);
+                }
+            } else if (config.supervisor && config.dialogue) {
+                this.storySystem.showDialogue(config.supervisor, config.dialogue);
+            }
+        } catch {
+            if (config.supervisor && config.dialogue) {
+                this.storySystem.showDialogue(config.supervisor, config.dialogue);
+            }
         }
         
         if (level > 0 && stats.levelStart) {

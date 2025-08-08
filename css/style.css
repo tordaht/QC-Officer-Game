@@ -348,6 +348,8 @@ canvas {
     text-align: center;
     z-index: 20;
     backdrop-filter: blur(5px);
+    overflow-y: auto; /* MOBİL: içerik taşarsa kaydırılabilir olsun */
+    padding: 16px;    /* MOBİL: kenar boşluğu */
 }
 
 .screen-overlay h1 { 
@@ -361,16 +363,18 @@ canvas {
 }
 
 .screen-overlay p { 
-    font-size: 1.3em; 
-    max-width: 80%; 
-    margin-bottom: 20px;
-    line-height: 1.6;
+    font-size: 1.2em; 
+    max-width: 92%; 
+    margin-bottom: 18px;
+    line-height: 1.55;
+    word-break: break-word;
+    overflow-wrap: anywhere;
 }
 
 .screen-overlay button {
     margin-top: 20px;
-    padding: 15px 40px;
-    font-size: 1.5em;
+    padding: 14px 36px;
+    font-size: 1.35em;
     font-weight: bold;
     color: #ecf0f1;
     background: linear-gradient(135deg, #c0392b, #e74c3c);
@@ -404,6 +408,13 @@ canvas {
 .screen-overlay button:hover { 
     transform: translateY(-3px);
     box-shadow: 0 6px 20px rgba(192, 57, 43, 0.6);
+}
+
+/* Başlangıç ekranı butonu masaüstünde daha büyük görünsün */
+#start-screen button {
+    min-width: 280px;
+    padding: 18px 50px;
+    font-size: 1.6em;
 }
 
 /* YÜZEN PUAN YAZILARI İÇİN ANİMASYON */
@@ -804,9 +815,9 @@ canvas {
 
 /* MEDYA SORGULARI - MOBİL UYUM */
 @media (max-width: 768px) {
-    .screen-overlay h1 { font-size: 2.5em; }
-    .screen-overlay p { font-size: 1.1em; }
-    .screen-overlay button { padding: 12px 30px; font-size: 1.2em; }
+    .screen-overlay h1 { font-size: 2.4em; }
+    .screen-overlay p { font-size: 1.05em; max-width: 96%; }
+    .screen-overlay button { padding: 12px 28px; font-size: 1.15em; }
     #powerup-container { gap: 10px; }
     .powerup-btn { padding: 10px 15px; font-size: 0.9em; }
     .mobile-controls { display: flex; }
@@ -829,12 +840,14 @@ canvas {
         right: 10px; 
         font-size: 0.8em; 
     }
+    .language-selector { flex-wrap: wrap; justify-content: center; }
+    .lang-btn { padding: 6px 12px; font-size: 13px; }
 }
 
 @media (max-width: 480px) {
-    .screen-overlay h1 { font-size: 2em; }
-    .screen-overlay p { font-size: 1em; }
-    .screen-overlay button { padding: 10px 20px; font-size: 1em; }
+    .screen-overlay h1 { font-size: 1.9em; }
+    .screen-overlay p { font-size: 0.95em; max-width: 98%; }
+    .screen-overlay button { padding: 10px 22px; font-size: 1.05em; }
     .intro-logo { 
         font-size: 2.2em; 
         letter-spacing: 0px;
@@ -850,6 +863,8 @@ canvas {
     }
     .ui-element { font-size: 1em; padding: 8px 12px; }
     #combo-display { font-size: 1.5em; }
+    .language-selector { gap: 8px; }
+    .lang-btn { padding: 6px 10px; font-size: 12px; }
 }
 
 /* YÜKLEME EKRANI */
