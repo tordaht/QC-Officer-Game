@@ -19,6 +19,12 @@ body {
     position: relative;
 }
 
+.missing-translation-badge {
+  color: #e74c3c;
+  font-size: 0.7em;
+  margin-left: 4px;
+}
+
 /* ARKA PLAN EFEKTLERİ */
 .bg-animation {
     position: fixed;

@@ -3,10 +3,12 @@
   "version": "2.0.0",
   "description": "A professional quality control simulation game built with HTML5 Canvas and vanilla JavaScript",
   "main": "index.html",
+  "type": "module",
   "scripts": {
     "start": "python -m http.server 8000",
     "serve": "npx serve .",
-    "test": "echo \"No tests specified\" && exit 0"
+    "test": "echo \"No tests specified\" && exit 0",
+    "lint": "eslint js"
   },
   "keywords": [
     "game",
@@ -36,5 +38,11 @@
     "last 2 versions",
     "> 1%",
     "not dead"
-  ]
+  ],
+  "devDependencies": {
+    "@eslint/js": "^9.33.0",
+    "eslint": "^9.33.0",
+    "eslint-config-prettier": "^10.1.8",
+    "prettier": "^3.6.2"
+  }
 }

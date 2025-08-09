@@ -355,6 +355,12 @@ class LanguageManager {
     updateAllTexts() {
         // notify subscribers that language changed
         EventBus.publish('languageChanged', this.currentLanguage);
+        if (window.coverageTest) {
+            const missing = window.coverageTest(this);
+            if (missing.length) {
+                console.warn('Missing i18n keys:', missing);
+            }
+        }
     }
 }
 

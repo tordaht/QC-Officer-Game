@@ -125,7 +125,7 @@ class Game {
         this.uiManager.elements.startButton.addEventListener('click', () => {
             this.uiManager.soundManager.play('click');
             this.uiManager.hideStartScreen();
-            window.GameSaveManager?.clear();
+            window.saveService?.clear();
             this.startGame();
         });
         
@@ -133,7 +133,7 @@ class Game {
             this.uiManager.soundManager.play('click');
             this.uiManager.hideGameOverScreen();
             this.resetGame();
-            window.GameSaveManager?.clear();
+            window.saveService?.clear();
             this.startGame();
         });
         
@@ -345,7 +345,7 @@ class Game {
         });
 
         // Kaydı periyodik olarak güncelle
-        window.GameSaveManager?.save({
+        window.saveService?.save({
             level: this.currentLevel,
             score: this.score,
             combo: this.combo
@@ -583,7 +583,7 @@ class Game {
     
     endGame(isWin = false) {
         this.engine.stop();
-        window.GameSaveManager?.clear();
+        window.saveService?.clear();
         this.gameState = 'gameover';
         this.clearAllEffects();
         
